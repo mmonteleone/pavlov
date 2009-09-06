@@ -1,7 +1,7 @@
 Pavlov
 ======
 Behavioral API over [QUnit][1]  
-[http://github.com/mmonteleone/pavlov](http://github.com/mmonteleone/pavlov)
+[http://github.com/mmonteleone/pavlov][11]
 
 What's all this then?
 ---------------------
@@ -153,7 +153,7 @@ Documentation:
 
 ### Downloading/Installing/Setup
 
-If you're just using Pavlov and not developing it or running its unit tests, just download the [latest packaged release from Github][0].
+If you're just using Pavlov and not developing it or running its unit tests, just download the [latest packaged release from Github][10].
 
 Contained in the package is a barebones **example spec setup**, which is just a standard QUnit test host document including the the normal QUnit dependencies, but also pavlov.js and a spec suite script.  
 
@@ -476,5 +476,6 @@ Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses
 [7]: http://github.com/jcoglan/packr "PackR"
 [8]: http://rake.rubyforge.org/ "Rake"
 [9]: http://rspec.info/ "RSpec"
-
+[10]: http://cloud.github.com/downloads/mmonteleone/pavlov/pavlov_0_1.zip "Pavlov Download"
+[11]: http://github.com/mmonteleone/pavlov "Pavlov"
 
