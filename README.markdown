@@ -1,8 +1,7 @@
 Pavlov
 ======
 Behavioral API over [QUnit][1]  
-http://github.com/mmonteleone/pavlov
-
+[http://github.com/mmonteleone/pavlov](http://github.com/mmonteleone/pavlov)
 
 What's all this then?
 ---------------------
@@ -164,6 +163,7 @@ Tests can be run by simply opening the test host document in a browser or by tak
 
 ### Creating Examples
 
+
 #### QUnit.specify()
 
 Function which declares a new QUnit.specify context.  It's the required top-level method which provides an overall scope for creation, compilation, and running of Pavlov specs.  
@@ -265,6 +265,7 @@ Examples can be nested as deep as necessary.
   
 ### Defining Specs
 
+
 #### it()
 
 Creates a spec (test) to occur within an example (decribe)
@@ -349,6 +350,7 @@ Most are self-explanatory.  Message parameter is always optional.
 * assert.fail(message);  // shortcut for assert().fail(message);
 * assert(fn).throwsException(message);  // asserts that executing passed fn throws an exception
 
+
 #### Adding custom Assertions
 
 `QUnit.specify.extendAssertions()`
@@ -386,6 +388,7 @@ For more readable tests, domain-specific assertions can be added.
 
 
 ### Extra
+
 
 #### wait()
 
