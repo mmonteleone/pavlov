@@ -1,0 +1,74 @@
+QUnit to JS Test Driver adapter
+===============================
+
+Version: 1.0.1
+Author: Karl O'Keeffe (karl@monket.net, http://monket.net)
+Blog post introduction: http://monket.net/blog/2009/06/new-qunit-to-js-test-driver-adapter/
+http://code.google.com/p/js-test-driver/source/browse/#svn/trunk/JsTestDriver/contrib/qunit
+
+Introduction
+------------
+
+Qunit Adapter provides a small wrapper around your QUnit tests that allows them to be run using JS Test Driver.
+
+It works by converting each qunit test and assertion into corresponding JS Test Driver test methods and assertions. Each qunit module maps to a JS Test Driver TestCase, each qunit test maps to a test method on that TestCase. And each qunit ok, equals, or same assertion maps to a JS Test Driver assertion. Qunit lifecycles (setup and teardown) also map to JS Test Driver setUp and tearDown.
+
+This ensures you still get assertion level error reporting when running your qunit tests with JS Test Driver.
+
+Essentially this adapter allows you to write native JS Test Driver tests, but using the less verbose qunit syntax.
+
+
+Installing the QUnit Adapter
+----------------------------
+
+Copy both the equiv.js and QUnitAdapter.js files to your project test directory (for example tests/qunit/).
+
+
+Configuring JS Test Driver
+--------------------------
+
+To run your qunit tests in JS Test Driver you need to configure it to load the adapter before your qunit tests.
+
+Update your jsTestDriver.conf to load the files:
+
+	server: http://localhost:9876
+ 
+	load:
+	  # Add these lines to load the equiv function and adapter in order, before the tests
+	  # (assuming they are saved to tests/qunit/)
+	  - tests/qunit/equiv.js
+	  - tests/qunit/QUnitAdapter.js
+ 
+	  # This is where we load the qunit tests
+	  - tests/js/*.js
+ 
+	  # And this loads the source files we are testing
+	  - src/js/*.js
+
+
+Running JS Test Driver with qunit tests
+---------------------------------------
+
+Now we can run JS Test Driver and watch as it runs all our qunit tests!
+
+The tests will run as individual JS Test Driver tests, with the format Module Name.Test Name.
+
+Example output:
+
+	[PASSED] Module 1.test Test 1
+	[PASSED] Module 1.test Test 2
+	[PASSED] Module 2.test Test 1
+	Total 3 tests (Passed: 3; Fails: 0; Errors: 0) (1.00 ms)
+	  Safari 530.18: Run 3 tests (Passed: 3; Fails: 0; Errors 0) (1.00 ms)
+
+
+Limitations
+-----------
+
+There are a few limitations on which qunit tests will successfully be converted.
+
+The tests must run synchronously (which means no use of the qunit stop and start methods).
+
+If you need to test timeouts, intervals, or other asynchronous sections of code, consider using the jsUnit Clock object to deal with timeouts and intervals.
+
+QUnit DOM support is not included. Consider avoiding interacting directly with the browser within your unit tests. But if you do need to, you’ll need to create and remove the DOM objects yourself with each test, or the setup and teardown methods.

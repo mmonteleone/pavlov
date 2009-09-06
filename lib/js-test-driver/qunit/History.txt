@@ -1,0 +1,10 @@
+1.0.1
+-----
+
+Fixed ok() assertion to behave the same as jquery (it now succeeds with anything other than 0, false, or null)
+
+
+1.0
+---
+
+First release
