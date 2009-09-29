@@ -36,7 +36,6 @@ task :build => [:clean] do
   cp 'README.markdown', 'dist/README.markdown'
 
   # copy lib
-  cp 'lib/jquery/jquery-1.3.2.min.js', 'dist/lib/jquery-1.3.2.min.js'
   cp 'lib/qunit/testrunner.js', 'dist/lib/testrunner.js'
   cp 'lib/qunit/testsuite.css', 'dist/lib/testsuite.css'
   cp 'lib/jquery/GPL-LICENSE.txt', 'dist/lib/GPL-LICENSE.txt'

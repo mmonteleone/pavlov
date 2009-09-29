@@ -8,10 +8,91 @@
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  */
-(function($){
+(function(){
     // capture reference to global scope 
     var globalScope = this;
     
+    // ===========
+    // = Helpers =
+    // ===========
+    
+    // Trimmed versions of jQuery helpers for use only within pavlov
+    
+    /**
+     * Iterates over an object or array
+     * @param {Object|Array} object object or array to iterate
+     * @param {Function} callback callback for each iterated item
+     */
+    var each = function(object, callback) {
+		var name;
+		var i = 0;
+		var length = object.length;
+
+		if ( length === undefined ) {
+			for ( name in object ) {
+				if ( callback.call( object[ name ], name, object[ name ] ) === false ) {
+					break;
+				}
+			}
+		} else {
+			for ( var value = object[0];
+				i < length && callback.call( value, i, value ) !== false; 
+				value = object[++i] ) {}
+		}
+
+		return object;        
+    };
+    
+    /**
+     * converts an array-like object to an array
+     * @param {Object} array array-like object
+     * @returns array
+     */
+    var makeArray = function(array) {
+		var ret = [];
+
+		var i = array.length;
+		while( i ) { ret[--i] = array[i]; }			
+		
+		return ret;        
+    };
+    
+    /**
+     * returns whether or not an object is an array
+     * @param {Object} obj object to test
+     * @returns whether or not object is array
+     */
+    var isArray = function(obj) {
+        return Object.prototype.toString.call(obj) === "[object Array]";        
+    };
+    
+    /**
+     * merges properties form one object to another
+     * @param {Object} dest object to receive merged properties
+     * @param {Object} src object containing properies to merge
+     */
+    var extend = function(dest, src) {
+        for(var prop in src) {
+            dest[prop] = src[prop];
+        }        
+    };
+
+    /**
+     * minimalist (and yes, non-optimal/leaky) event binder
+     * not meant for wide use.  only for jquery-less internal use in pavlov
+     * @param {Element} elem Event-triggering Element
+     * @param {String} type name of event
+     * @param {Function} fn callback
+     */
+    var addEvent = function(elem, type, fn){
+    	if ( elem.addEventListener ) {
+    		elem.addEventListener( type, fn, false );
+    	} else if ( elem.attachEvent ) {
+    		elem.attachEvent( "on" + type, fn );
+    	}
+    };
+    
+        
     // ====================
     // = Example Building =
     // ====================
@@ -170,11 +251,11 @@
      * @param {Object} asserts Object containing assertion implementations
      */
     var addAssertions = function(asserts) {
-        $.each(asserts, function(name, fn){
+        each(asserts, function(name, fn){
             assertHandler.prototype[name] = function() {
                 // implement this handler against backend
                 // by pre-pending assertHandler's current value to args
-                var args =  $.makeArray(arguments);
+                var args =  makeArray(arguments);
                 args.unshift(this.value);           
                 fn.apply(this, args);
             };
@@ -253,7 +334,7 @@
          * @param {Array} arguments either list of values or list of arrays of values
          */
         given: function() {
-            var args = arguments;
+            var args = makeArray(arguments);
             var thisIt = this.it;
 
             return {
@@ -262,10 +343,10 @@
                  * of the given's arguments.
                  */
                 it: function(specification, fn) {
-                    $.each(args, function(){
-                        var arg = this;
+                    each(args, function(){                        
+                        var arg = this;   
                         thisIt("given " + arg + ", " + specification, function(){ 
-                            fn.apply(this, $.isArray(arg) ? arg : [arg]);
+                            fn.apply(this, isArray(arg) ? arg : [arg]);
                         });
                     });
                 }
@@ -297,7 +378,7 @@
     };
 
     // extend api's assert function for easier syntax for blank pass and fail
-    $.extend(api.assert, {
+    extend(api.assert, {
         /**
          * Shortcuts assert().pass() with assert.pass()
          * @param {String} message Assertion message (optional)
@@ -342,7 +423,7 @@
         // pre-pends extraScope arg, and applies to modified fn
         return function(){ 
             var args = [extraScope];
-            $.each(arguments,function(){
+            each(arguments,function(){
                 args.push(this);
             });
             fn.apply(thisArg, args);
@@ -359,15 +440,15 @@
         currentExample = null;
 
         // set the test suite title
-        $(function(){
-            $('h1').html(name);
-            $(document).attr('title', name + " Specifications");            
+        document.title = name + " Specifications";
+        addEvent(window,'load',function(){
+            document.getElementById('header').innerHTML = name;
         });
 
         if(QUnit.specify.globalApi) { 
             // if set to extend global api, 
             // extend global api and run example builder
-            $.extend(globalScope, api);
+            extend(globalScope, api);
             fn(); 
         } else { 
             // otherwise, extend example builder's scope with api
@@ -379,7 +460,7 @@
         var qunitStatements = compile(examples);
 
         // run qunit tests
-        $.each(qunitStatements, function(){ this(); });
+        each(qunitStatements, function(){ this(); });
     };  
 
 
@@ -413,16 +494,16 @@
             statements.push(function(){
                 module(example.names(), {
                     setup: function(){
-                        $.each(befores, function(){ this(); });
+                        each(befores, function(){ this(); });
                     },
                     teardown: function(){
-                        $.each(afters, function(){ this(); });
+                        each(afters, function(){ this(); });
                     }
                 });
             });
 
             // create a test for each spec/"it" in the example
-            $.each(example.specs, function(){
+            each(example.specs, function(){
                 var spec = this;
                 statements.push(function(){
                     test(spec[0],spec[1]);
@@ -430,14 +511,14 @@
             });
             
             // recurse through example's nested examples
-            $.each(example.children, function() {
+            each(example.children, function() {
                 compileDescription(this);            
             });
         };
         
 
         // compile all root examples
-        $.each(examples, function() {
+        each(examples, function() {
             compileDescription(this, statements);
         });
 
@@ -453,11 +534,11 @@
     // extend QUnit
     QUnit.specify = specify;
     // add global settings onto QUnit.specify
-    $.extend(specify, {
+    extend(specify, {
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions,  // function for adding custom assertions
         globalObject: window              // injectable global containing setTimeout and pals
     });
 
-})(jQuery);
+})();
 

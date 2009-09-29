@@ -12,25 +12,10 @@ test("standard QUnit Test should still run alongside QUnit.specify", function() 
 QUnit.specify("Pavlov", function() {
 
     describe("a QUnit.specify()", function() {
-        it("should set the page title to the spec name", function() {
-            // temporarily mock the jQuery.fn.html()
-            // to track that it was called and with what arg
-            var originalHtmlMethod = $.fn.html;
-            var htmlArg = null;
-            try {
-                $.fn.html = function(text) {
-                    htmlArg = text;
-                };
-                QUnit.specify("Pavlov", function(){});
-            } finally{
-                $.fn.html = originalHtmlMethod;
-            }
-            assert(htmlArg).isEqualTo("Pavlov");
-        });
-
         it("should set the document title to spec name + ' Specifications'", function() {
             // temporarily mock jQuery.fn.attr to track 
             // the usage of it 
+            /*
             var originalAttr = $.fn.attr;
             try{
                 var passedName = null;
@@ -43,8 +28,8 @@ QUnit.specify("Pavlov", function() {
             } finally {
                 $.fn.attr = originalAttr;
             } 
-            assert(passedName).isEqualTo("title");
-            assert(passedVal).isEqualTo("Pavlov Specifications");
+            */
+            assert($(document).attr('title')).isEqualTo("Pavlov Specifications");
         });
 
         it("should run the spec lambda", function() {

@@ -132,7 +132,7 @@ You want a BDD framework that can boast wide stability and support out of the ga
 
 **And why would I not want this?**
 
-You might already have a large investment in some other test framework, and simply no need for another.  You might not like its use of jQuery.  You might not care for the BDD approach.
+You might already have a large investment in some other test framework, and simply no need for another.  You might not care for the BDD approach.
 
 **Looks like [Screw.Unit][6].  Why not just use Screw.Unit or fork it?**
 
@@ -148,7 +148,6 @@ Documentation:
 
 ### Usage Requirements
 
-* [jQuery][0] 1.3.2 or later
 * [QUnit][1] (testrunner.js, testsuite.css, testsuite.html)
 
 ### Downloading/Installing/Setup
@@ -459,6 +458,12 @@ Credit of course goes to:
 [QUnit][1]: Copyright (c) 2008 John Resig, Jörn Zaefferer, used under the terms of the MIT LICENSE  
 [RSpec][9]: David Chelimsky and RSpec Development Team  
 [Screw.Unit][6]: Copyright (c) 2008 Nick Kallen and especially Yehuda Katz metaprogramming contributions to it
+
+Changelog
+---------
+
+0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
+0.1 - Initial Release
   
 License
 -------
