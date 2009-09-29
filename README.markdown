@@ -462,8 +462,8 @@ Credit of course goes to:
 Changelog
 ---------
 
-0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
-0.1 - Initial Release
+* 0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
+* 0.1 - Initial Release
   
 License
 -------
