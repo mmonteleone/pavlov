@@ -24,8 +24,7 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
 
     describe("Bowling", function(){
         // variables scoped only to this and nested examples
-        var bowling;
-        
+        var bowling;        
         
         // befores and afters:
   
@@ -34,8 +33,7 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
             // in this example, and any nested examples
             bowling = new Bowling();        
         });
-        
-        
+                
         // specs:
       
         it("should score 0 for gutter game", function(){
@@ -45,26 +43,11 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
         
             assert(bowling.score).equals(0);
         });
-      
-        it("should only allow 10 frames", function(){
-            // add 10 frames
-            for(var i=0;i<10;i++) {
-                bowling.moveNextFrame();
-            } 
-        
-            // try to add an 11th  
-            // expect an exception      
-            assert(function(){
-                bowling.moveNextFrame();
-            }).throwsException();
-        });
-              
-      
+                          
         // stubs specs which yield "Not Implemented" failures:
         
         it("should allow 2 rolls on frame 1-9");
-        it("should allow 3 rolls on the last frame");
-      
+        it("should allow 3 rolls on the last frame");      
             
         // generative row tests:
         
@@ -79,9 +62,8 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
 
                 assert(bowling.displayMessage).equals('Spare!');
             });
-
       
-        // nested example:
+        // nested examples (n-level depth):
 
         describe("Duck Pin Variation", function(){
         
@@ -95,7 +77,22 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
             it("should award no bonus if knocked down in 3rd frame");
                 
         });
-      
+        
+        // fluent assertions
+        
+        it("should only allow 10 frames", function(){
+            // add 10 frames
+            for(var i=0;i<10;i++) {
+                bowling.moveNextFrame();
+            } 
+        
+            // try to add an 11th  
+            // expect an exception      
+            assert(function(){
+                bowling.moveNextFrame();
+            }).throwsException();
+        });
+              
     });
 
 **...Pavlov compiles the examples down into flattened vanilla QUnit `module` and `test` statements which are then executed**
