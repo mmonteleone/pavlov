@@ -24,23 +24,23 @@
      * @param {Function} callback callback for each iterated item
      */
     var each = function(object, callback) {
-		var name;
-		var i = 0;
-		var length = object.length;
+        var name;
+        var i = 0;
+        var length = object.length;
 
-		if ( length === undefined ) {
-			for ( name in object ) {
-				if ( callback.call( object[ name ], name, object[ name ] ) === false ) {
-					break;
-				}
-			}
-		} else {
-			for ( var value = object[0];
-				i < length && callback.call( value, i, value ) !== false; 
-				value = object[++i] ) {}
-		}
+        if ( length === undefined ) {
+            for ( name in object ) {
+                if ( callback.call( object[ name ], name, object[ name ] ) === false ) {
+                    break;
+                }
+            }
+        } else {
+            for ( var value = object[0];
+                i < length && callback.call( value, i, value ) !== false; 
+                value = object[++i] ) {}
+        }
 
-		return object;        
+        return object;        
     };
     
     /**
@@ -49,12 +49,12 @@
      * @returns array
      */
     var makeArray = function(array) {
-		var ret = [];
+        var ret = [];
 
-		var i = array.length;
-		while( i ) { ret[--i] = array[i]; }			
-		
-		return ret;        
+        var i = array.length;
+        while( i ) { ret[--i] = array[i]; }         
+        
+        return ret;        
     };
     
     /**
@@ -85,11 +85,11 @@
      * @param {Function} fn callback
      */
     var addEvent = function(elem, type, fn){
-    	if ( elem.addEventListener ) {
-    		elem.addEventListener( type, fn, false );
-    	} else if ( elem.attachEvent ) {
-    		elem.attachEvent( "on" + type, fn );
-    	}
+        if ( elem.addEventListener ) {
+            elem.addEventListener( type, fn, false );
+        } else if ( elem.attachEvent ) {
+            elem.attachEvent( "on" + type, fn );
+        }
     };
     
         
@@ -441,8 +441,11 @@
 
         // set the test suite title
         document.title = name + " Specifications";
-        addEvent(window,'load',function(){
-            document.getElementById('header').innerHTML = name;
+        addEvent(window,'load',function(){            
+            // document.getElementsByTag('h1').innerHTML = name;
+            var h1s = document.getElementsByTagName('h1');
+            if(h1s.length > 0) 
+                h1s[0].innerHTML = document.title;
         });
 
         if(QUnit.specify.globalApi) { 

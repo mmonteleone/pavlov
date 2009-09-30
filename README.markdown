@@ -462,6 +462,7 @@ Credit of course goes to:
 Changelog
 ---------
 
+* 0.2.1 - Updated to latest version of qunit.js/css, Fixed an IE regression in 0.2
 * 0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
 * 0.1 - Initial Release
   

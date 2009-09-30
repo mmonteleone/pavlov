@@ -10,25 +10,9 @@ test("standard QUnit Test should still run alongside QUnit.specify", function() 
 
 
 QUnit.specify("Pavlov", function() {
-
+    
     describe("a QUnit.specify()", function() {
         it("should set the document title to spec name + ' Specifications'", function() {
-            // temporarily mock jQuery.fn.attr to track 
-            // the usage of it 
-            /*
-            var originalAttr = $.fn.attr;
-            try{
-                var passedName = null;
-                var passedVal = null;
-                $.fn.attr = function(name, val) {
-                    passedName = name;
-                    passedVal = val;                    
-                };
-                QUnit.specify("Pavlov", function(){});
-            } finally {
-                $.fn.attr = originalAttr;
-            } 
-            */
             assert($(document).attr('title')).isEqualTo("Pavlov Specifications");
         });
 
@@ -198,7 +182,7 @@ QUnit.specify("Pavlov", function() {
                 var original = {
                     stop: stop,
                     start: start,
-                    setTimeout: setTimeout                                        
+                    setTimeout: window.setTimeout                                        
                 };
                 var calls = [];
                 var setTimeoutMs = 0;
@@ -208,7 +192,7 @@ QUnit.specify("Pavlov", function() {
                     // mock timing functions to capture their calls from wait()
                     stop = function() { calls.push('stop'); };
                     start = function() { calls.push('start'); };
-                    setTimeout = function(fn, ms) {
+                    window.setTimeout = function(fn, ms) {
                         calls.push('settimeout');
                         setTimeoutMs = ms;
                         fn();
@@ -223,7 +207,7 @@ QUnit.specify("Pavlov", function() {
                     // undo mocking
                     stop = original.stop;
                     start = original.start;
-                    setTimeout = original.setTimeout;                                        
+                    window.setTimeout = original.setTimeout;                                        
                 }
                 
                 // check if calls to mocked fn's occurred correctly
