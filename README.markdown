@@ -344,7 +344,7 @@ Most are self-explanatory.  Message parameter is always optional.
 * assert(actual).isUndefined(message);
 * assert.pass(message);  // shortcut for assert().pass(message);
 * assert.fail(message);  // shortcut for assert().fail(message);
-* assert(fn).throwsException(message);  // asserts that executing passed fn throws an exception
+* assert(fn).throwsException(expectedErrorDescription, message);  // asserts that executing passed fn throws an exception (optionally with expected description)
 
 
 #### Adding custom Assertions
@@ -435,7 +435,7 @@ Contributing
 
 Development Requirements (for building and test running):
 
-* Ruby + Rake and PackR gems: for building and minifying
+* Ruby + Rake, PackR, rubyzip gems: for building and minifying
 * Java: if you want to test using the included JsTestDriver setup
 
 Clone the source at `http://github.com/mmonteleone/pavlov.git` and have at it.
@@ -459,6 +459,12 @@ Credit of course goes to:
 Changelog
 ---------
 
+* 0.2.2
+	- now supports `expectedErrorDescription` argument on `assert.throwsException`
+	- supports `rake release`
+	- updated to latest release of qunit
+	- reports own version at QUnit.specify.version
+	- throws proper exceptions when methods not passed expected arguments
 * 0.2.1 - Updated to latest version of qunit.js/css, Fixed an IE regression in 0.2
 * 0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
 * 0.1 - Initial Release

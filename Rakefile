@@ -2,6 +2,8 @@ require 'rubygems'
 require 'net/http'
 require 'rake/clean'
 require 'packr'
+require 'zip/zip'
+require 'find'
 require 'fileutils'
 include FileUtils
   
@@ -20,7 +22,7 @@ BROWSERS = [
   'C:/Program Files/Opera/opera.exe' ]
 
 
-desc "Builds a release"
+desc "'Compiles' sources and examples together"
 task :build => [:clean] do
   # build dist and lib directories
   mkdir 'dist'
@@ -56,6 +58,21 @@ task :build => [:clean] do
     combined.write(minified)  
   end
 end
+
+desc "Generates a releasable zip archive"
+task :release => [:build] do
+  root = pwd+'/dist'
+  zip_archive = pwd+'/dist/Pavlov.zip'
+
+  Zip::ZipFile.open(zip_archive, Zip::ZipFile::CREATE) do |zip|
+    Find.find(root) do |path|
+      Find.prune if File.basename(path)[0] == ?.
+      dest = /dist\/(\w.*)/.match(path)
+      zip.add(dest[1],path) if dest
+    end 
+  end    
+end
+
 
 
 desc "Run the tests in default browser"

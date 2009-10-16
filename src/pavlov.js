@@ -223,13 +223,18 @@
         fail: function(actual, message) {
             ok(!true, message);
         },
-        throwsException: function(actual, message) {
+        throwsException: function(actual, expectedErrorDescription, message) {
+            /* can optionally accept expected error message */
             try{
                 actual();
                 ok(!true, message);
             } catch(e) {
-                ok(true, message);
-            }
+                if(arguments.length > 1) {
+                    ok(e === expectedErrorDescription, message);                        
+                } else {
+                    ok(true, message);                        
+                }
+            }                               
         }
     };
 
@@ -281,6 +286,10 @@
          * @param {Function} fn Function containing description (before, after, specs, nested examples)
          */
         describe: function(description, fn) {
+            if(arguments.length < 2) {
+                throw("both 'description' and 'fn' arguments are required");
+            }
+            
             // capture reference to current example before construction
             var originalExample = currentExample;
             try{
@@ -299,6 +308,9 @@
          * @param {Function} fn Function to be executed         
          */
         before: function(fn) {
+            if(arguments.length === 0) {
+                throw("'fn' argument is required");
+            }
             currentExample.before = fn;
         },
         
@@ -307,6 +319,9 @@
          * @param {Function} fn Function to be executed         
          */
         after: function(fn) {
+            if(arguments.length === 0) {
+                throw("'fn' argument is required");
+            }
             currentExample.after = fn;
         },
         
@@ -317,6 +332,9 @@
          * @param {Function} fn Function containing a test to assert that it does indeed do it (optional)
          */
         it: function(specification, fn) {
+            if(arguments.length === 0) {
+                throw("'specification' argument is required");
+            }
             thisApi = this;
             if(fn) {
                 currentExample.specs.push([specification, fn]);
@@ -334,6 +352,9 @@
          * @param {Array} arguments either list of values or list of arrays of values
          */
         given: function() {
+            if(arguments.length === 0) {
+                throw("at least one argument is required");
+            }
             var args = makeArray(arguments);
             var thisIt = this.it;
 
@@ -369,6 +390,9 @@
          * passed before resuming
          */
         wait: function(ms, fn) {
+            if(arguments.length < 2) {
+                throw("both 'ms' and 'fn' arguments are required");
+            }
             stop();
             QUnit.specify.globalObject.setTimeout(function(){
                 fn();
@@ -436,6 +460,9 @@
      * @param {Function} fn Function containing exmaples and specs     
      */
     var specify = function(name, fn) {
+        if(arguments.length < 2) {
+            throw("both 'name' and 'fn' arguments are required")
+        }
         examples = [];
         currentExample = null;
 
@@ -538,6 +565,7 @@
     QUnit.specify = specify;
     // add global settings onto QUnit.specify
     extend(specify, {
+        version: '0.2.2',
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions,  // function for adding custom assertions
         globalObject: window              // injectable global containing setTimeout and pals

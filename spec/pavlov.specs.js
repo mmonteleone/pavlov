@@ -12,6 +12,15 @@ test("standard QUnit Test should still run alongside QUnit.specify", function() 
 QUnit.specify("Pavlov", function() {
     
     describe("a QUnit.specify()", function() {
+        it("should throw exception if name or fn params not passed", function(){
+            assert(function(){
+                QUnit.specify(function(){});
+            }).throwsException("both 'name' and 'fn' arguments are required");
+            assert(function(){
+                QUnit.specify("description");
+            }).throwsException("both 'name' and 'fn' arguments are required");
+        });
+        
         it("should set the document title to spec name + ' Specifications'", function() {
             assert($(document).attr('title')).isEqualTo("Pavlov Specifications");
         });
@@ -53,6 +62,27 @@ QUnit.specify("Pavlov", function() {
             afterCallCount++;
             afterCalls.push('y');
         });
+        
+        it("should throw exception if not passed a description and fn", function(){
+            assert(function(){
+                describe("some description");                                
+            }).throwsException("both 'description' and 'fn' arguments are required");
+            assert(function(){
+                describe(function(){});                                
+            }).throwsException("both 'description' and 'fn' arguments are required");
+        });
+        
+        it("should throw exception when before() not passed an fn", function(){
+            assert(function(){
+                before();
+            }).throwsException("'fn' argument is required")
+        });
+        
+        it("should throw exception when after() not passed an fn", function(){
+            assert(function(){
+                after();
+            }).throwsException("'fn' argument is required")            
+        });
 
         it("should execute lambda", function() {
             // implicitly true by virtue of this running
@@ -60,13 +90,13 @@ QUnit.specify("Pavlov", function() {
         });
 
         it("should execute before() before each it()", function() {
-            assert(beforeCallCount).equals(2);
-            assert(afterCallCount).equals(1);
+            assert(beforeCallCount).equals(5);
+            assert(afterCallCount).equals(4);
         });
 
         it("should execute after() after each it()", function() {
-            assert(beforeCallCount).equals(3);
-            assert(afterCallCount).equals(2);
+            assert(beforeCallCount).equals(6);
+            assert(afterCallCount).equals(5);
         });
 
         describe("with a nested describe()", function() {
@@ -81,13 +111,13 @@ QUnit.specify("Pavlov", function() {
             });
 
             it("should execute all before()s from outside-in", function() {
-                assert(beforeCalls).isSameAs(['x', 'x', 'x', 'x', 'x', 'a']);
-                assert(afterCalls).isSameAs(['y', 'y', 'y', 'y']);
+                assert(beforeCalls).isSameAs(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'a']);
+                assert(afterCalls).isSameAs(['y', 'y', 'y', 'y', 'y', 'y', 'y']);
             });
 
             it("should execute all after()s from inside-out", function() {
-                assert(beforeCalls).isSameAs(['x', 'x', 'x', 'x', 'x', 'a', 'x', 'a']);
-                assert(afterCalls).isSameAs(['y', 'y', 'y', 'y', 'b', 'y']);
+                assert(beforeCalls).isSameAs(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'a', 'x', 'a']);
+                assert(afterCalls).isSameAs(['y', 'y', 'y', 'y', 'y', 'y', 'y', 'b', 'y']);
             });
 
             it("should have access to own describe scope", function() {
@@ -105,6 +135,12 @@ QUnit.specify("Pavlov", function() {
     });
 
     describe("an it()", function() {
+        it("should throw exception if not passed at least a specification", function(){
+            assert(function(){
+                it();                                
+            }).throwsException("'specification' argument is required");          
+        });
+        
         it("should generate and run a test", function() {
             ok(true);  // implicitly true by virtue of this running           
         });
@@ -121,7 +157,7 @@ QUnit.specify("Pavlov", function() {
                     // keep Pavlov from doing its job
                     // later, will verify the correct behavior happened with 1 arg.
                     it = function() {
-                        if(arguments.length == 2) {
+                        if(arguments.length === 2) {
                             args = $.makeArray(arguments);
                         } else {
                             originalIt.apply(this,arguments);
@@ -156,6 +192,12 @@ QUnit.specify("Pavlov", function() {
         });
 
         describe("after a given()", function() {
+            
+            it("should throw exception when given() not passed at least an arg", function(){
+                assert(function(){
+                    given();
+                }).throwsException("at least one argument is required");
+            });
 
             var singleArgGivenCount = 0;
 
@@ -177,6 +219,18 @@ QUnit.specify("Pavlov", function() {
         });
 
         describe("with a wait()", function() {
+            
+            it("should throw exception if not passed both fn and ms", function(){
+                assert(function(){
+                    wait();                                        
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+                assert(function(){
+                    wait(54);                                        
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+                assert(function(){
+                    wait(function(){});                                        
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+            });
 
             it("should stop(), run a setTimeout() for duration, then execute lambda and start()", function() {
                 var original = {
@@ -562,11 +616,11 @@ QUnit.specify("Pavlov", function() {
                     assert(function(){
                         // should throw undefined exceptions
                         var totalPrice = unitPrice * quantity;
-                    }).throwsException("message");
+                    }).throwsException();
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);
+                assert(passedArgs).isSameAs([true,undefined]);
             });
             
             it("should pass false to qunit's ok() when function does not throw exception", function(){
@@ -576,13 +630,36 @@ QUnit.specify("Pavlov", function() {
                         var unitPrice = 10;
                         var quantity = 4;
                         var totalPrice = unitPrice * quantity;
-                    }).throwsException("message");
+                    }).throwsException();
+                });
+                
+                // verify correct arguments would have been passed to qunit
+                assert(passedArgs).isSameAs([false,undefined]);                
+            });
+            
+            it("should pass true to qunit's ok() when function throws exception with expected description", function(){
+                var passedArgs = mockQunitAssertion('ok', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
+                    assert(function(){
+                        throw("expected description");
+                    }).throwsException("expected description", "message");
+                });
+                
+                // verify correct arguments would have been passed to qunit
+                assert(passedArgs).isSameAs([true,"message"]);
+            });
+            
+            it("should pass false to qunit's ok() when function throws exception with unexpected description", function(){
+                var passedArgs = mockQunitAssertion('ok', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
+                    assert(function(){
+                        throw("some other error description");
+                    }).throwsException("expected description", "message");
                 });
                 
                 // verify correct arguments would have been passed to qunit
                 assert(passedArgs).isSameAs([false,"message"]);                
             });
-            
         });
         
         describe("custom assertions", function(){
