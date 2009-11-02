@@ -1,6 +1,8 @@
 /**
  * Pavlov - Behavioral API over QUnit
  * 
+ * version 0.2.3
+ * 
  * http://michaelmonteleone.net/projects/pavlov
  * http://github.com/mmonteleone/pavlov
  *
@@ -565,7 +567,7 @@
     QUnit.specify = specify;
     // add global settings onto QUnit.specify
     extend(specify, {
-        version: '0.2.2',
+        version: '0.2.3',
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions,  // function for adding custom assertions
         globalObject: window              // injectable global containing setTimeout and pals

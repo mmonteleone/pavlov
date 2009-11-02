@@ -459,12 +459,15 @@ Credit of course goes to:
 Changelog
 ---------
 
+* 0.2.3 
+    - removed GPL license.  Now just MIT.  So long, jQuery dual license weirdness.
+    - cleaned up and hopefully simplified project tree
 * 0.2.2
-	- now supports `expectedErrorDescription` argument on `assert.throwsException`
-	- supports `rake release`
-	- updated to latest release of qunit
-	- reports own version at QUnit.specify.version
-	- throws proper exceptions when methods not passed expected arguments
+    - now supports `expectedErrorDescription` argument on `assert.throwsException`
+    - supports `rake release`
+    - updated to latest release of qunit
+    - reports own version at QUnit.specify.version
+    - throws proper exceptions when methods not passed expected arguments
 * 0.2.1 - Updated to latest version of qunit.js/css, Fixed an IE regression in 0.2
 * 0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
 * 0.1 - Initial Release
@@ -472,8 +475,29 @@ Changelog
 License
 -------
 
-Copyright (c) 2009 Michael Monteleone  
-Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+Copyright (c) 2009 Michael Monteleone, http://michaelmonteleone.net
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 
 [0]: http://jquery.com "jQuery"
 [1]: http://docs.jquery.com/QUnit "QUnit"
@@ -485,6 +509,6 @@ Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses
 [7]: http://github.com/jcoglan/packr "PackR"
 [8]: http://rake.rubyforge.org/ "Rake"
 [9]: http://rspec.info/ "RSpec"
-[10]: http://cloud.github.com/downloads/mmonteleone/pavlov/pavlov_0_1.zip "Pavlov Download"
+[10]: http://cloud.github.com/downloads/mmonteleone/pavlov/pavlov.zip "Pavlov Download"
 [11]: http://github.com/mmonteleone/pavlov "Pavlov"
 

@@ -30,31 +30,30 @@ task :build => [:clean] do
   mkdir 'dist/example'
 
   # copy src
-  cp 'src/pavlov.js', 'dist/pavlov.js'
+  cp 'pavlov.js', 'dist/pavlov.js'
   
   # copy documentation
-  cp 'doc/GPL-LICENSE.txt', 'dist/GPL-LICENSE.txt'
-  cp 'doc/MIT-LICENSE.txt', 'dist/MIT-LICENSE.txt'
   cp 'README.markdown', 'dist/README.markdown'
 
   # copy lib
-  cp 'lib/qunit/qunit.js', 'dist/lib/qunit.js'
-  cp 'lib/qunit/qunit.css', 'dist/lib/qunit.css'
-  cp 'lib/jquery/GPL-LICENSE.txt', 'dist/lib/GPL-LICENSE.txt'
-  cp 'lib/jquery/MIT-LICENSE.txt', 'dist/lib/MIT-LICENSE.txt'
+  cp 'lib/qunit.js', 'dist/lib/qunit.js'
+  cp 'lib/qunit.css', 'dist/lib/qunit.css'
+  cp 'spec/lib/jquery/GPL-LICENSE.txt', 'dist/lib/GPL-LICENSE.txt'
+  cp 'spec/lib/jquery/MIT-LICENSE.txt', 'dist/lib/MIT-LICENSE.txt'
   
   # copy example
-  cp 'doc/example/example.specs.html', 'dist/example/example.specs.html'
-  cp 'doc/example/example.specs.js', 'dist/example/example.specs.js'
+  cp 'example/example.specs.html', 'dist/example/example.specs.html'
+  cp 'example/example.specs.js', 'dist/example/example.specs.js'
 
   
   # minify src
   source = File.read('dist/pavlov.js')
   minified = Packr.pack(source, :shrink_vars => true, :base62 => false)
+  header = /\/\*.*?\*\//m.match(source)
 
   # inject header
   File.open('dist/pavlov.min.js', 'w') do |combined|
-    combined.puts(IO.read('src/header.js'))
+    combined.puts(header)
     combined.write(minified)  
   end
 end
@@ -89,24 +88,24 @@ end
 
 desc "Run the tests against JsTestDriver"
 task :testdrive => [:build] do
-  sh("java -jar lib/js-test-driver/JsTestDriver.jar --tests all --captureConsole --reset")
+  sh("java -jar spec/lib/js-test-driver/JsTestDriver.jar --tests all --captureConsole --reset")
 end
 
 
 desc "Start the JsTestDriver server"
 task :server => [:install_server] do
   browsers = BROWSERS.find_all{|b| File.exists? b}.join(',')
-  sh("java -jar lib/js-test-driver/JsTestDriver.jar --port 9876 --browser \"#{browsers}\"")
+  sh("java -jar spec/lib/js-test-driver/JsTestDriver.jar --port 9876 --browser \"#{browsers}\"")
 end
 
 
 desc "Download Google JsTestDriver"
 task :install_server do
-  if !File.exist?('lib/js-test-driver/JsTestDriver.jar') then
+  if !File.exist?('spec/lib/js-test-driver/JsTestDriver.jar') then
     puts 'Downloading JsTestDriver from Google (http://js-test-driver.googlecode.com/files/JsTestDriver-1.0b.jar) ...'
     Net::HTTP.start("js-test-driver.googlecode.com") do |http|
       resp = http.get("/files/JsTestDriver-1.0b.jar")
-      open("lib/js-test-driver/JsTestDriver.jar", "wb") do |file|
+      open("spec/lib/js-test-driver/JsTestDriver.jar", "wb") do |file|
         file.write(resp.body)
       end
     end
@@ -118,4 +117,4 @@ end
 # clean deletes built copies
 CLEAN.include('dist/')
 # clobber cleans and uninstalls JsTestDriver server
-CLOBBER.include('lib/js-test-driver/*.jar')  
+CLOBBER.include('spec/lib/js-test-driver/*.jar')  
