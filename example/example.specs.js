@@ -1,4 +1,4 @@
-QUnit.specify("Pavlov Example", function(){
+pavlov("Pavlov Example", function(){
     
     describe("A feature that is being described", function(){
         

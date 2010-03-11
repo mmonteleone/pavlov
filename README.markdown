@@ -1,7 +1,9 @@
 Pavlov
 ======
-Behavioral API over [QUnit][1]  
+Behavioral API over JavaScript Test Frameworks  
 [http://github.com/mmonteleone/pavlov][11]
+
+**This is an experimental framework-agnostic branch of Pavlov with the goal of allowing additional backends beside QUnit**
 
 What's all this then?
 ---------------------
@@ -459,6 +461,8 @@ Credit of course goes to:
 Changelog
 ---------
 
+* 0.3.0pre 
+    - abstracting test framework dependency to allow for additional test frameworks
 * 0.2.3 
     - removed GPL license.  Now just MIT.  So long, jQuery dual license weirdness.
     - cleaned up and hopefully simplified project tree
@@ -475,7 +479,7 @@ Changelog
 License
 -------
 
-Copyright (c) 2009 Michael Monteleone, http://michaelmonteleone.net
+Copyright (c) 2010 Michael Monteleone, http://michaelmonteleone.net
 
 The MIT License
 

@@ -2,22 +2,22 @@ var standardQUnitTestRan = false;
 
 module("standard QUnit module");
 
-test("standard QUnit Test should still run alongside QUnit.specify", function() {
+test("standard QUnit Test should still run alongside pavlov", function() {
     expect(1);
     standardQUnitTestRan = true;
     ok(standardQUnitTestRan);
 });
 
 
-QUnit.specify("Pavlov", function() {
+pavlov("Pavlov", function() {
     
-    describe("a QUnit.specify()", function() {
+    describe("a pavlov()", function() {
         it("should throw exception if name or fn params not passed", function(){
             assert(function(){
-                QUnit.specify(function(){});
+                pavlov(function(){});
             }).throwsException("both 'name' and 'fn' arguments are required");
             assert(function(){
-                QUnit.specify("description");
+                pavlov("description");
             }).throwsException("both 'name' and 'fn' arguments are required");
         });
         
@@ -297,28 +297,28 @@ QUnit.specify("Pavlov", function() {
     
         describe("equals()", function() {
 
-            it("should pass arguments to qunit's equals()", function() {
-                var passedArgs = mockQunitAssertion('equals', function(){
+            it("should pass === value of arguments to qunit's ok()", function() {
+                var passedArgs = mockQunitAssertion('ok', function(){
                     // run spec assertion while underlying qunit assertion is mocked
                     assert(4).equals(2, "some message");
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([4,2,"some message"]);
+                assert(passedArgs).isSameAs([4 === 2,"some message"]);
             });
 
         });
 
         describe("isEqualTo()", function() {
 
-            it("should pass arguments to qunit's equals()", function() {
-                var passedArgs = mockQunitAssertion('equals', function(){
+            it("should pass === value of arguments to qunit's ok()", function() {
+                var passedArgs = mockQunitAssertion('ok', function(){
                     // run spec assertion while underlying qunit assertion is mocked
                     assert(4).isEqualTo(2, "some message");
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([4,2,"some message"]);
+                assert(passedArgs).isSameAs([4 === 2,"some message"]);
             });
 
         });
@@ -349,14 +349,26 @@ QUnit.specify("Pavlov", function() {
 
         describe("isSameAs()", function() {
 
-            it("should pass arguments to qunit's same()", function() {
-                var passedArgs = mockQunitAssertion('same', function(){
-                    // run spec assertion while underlying qunit assertion is mocked
-                    assert(4).isSameAs(2, "some message");
-                });
-                
+            it("should pass arguments to qunit's equiv and result to ok()", function() {
+                var originalEquiv = QUnit.equiv;
+                var calls = [];
+                try {
+                    QUnit.equiv = function(actual, expected) {
+                        calls.push($.makeArray(arguments));
+                        return true;
+                    };
+                    var passedArgs = mockQunitAssertion('ok', function(){
+                        // run spec assertion while underlying qunit assertion is mocked
+                        assert(4).isSameAs(2, "some message");
+                    });
+                }finally{
+                    QUnit.equiv = originalEquiv;    
+                }
+
+                // make sure equiv was called
+                assert(calls).isSameAs([[4,2]]);
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([4,2,"some message"]);
+                assert(passedArgs).isSameAs([true,"some message"]);
             });
 
         });
@@ -664,9 +676,9 @@ QUnit.specify("Pavlov", function() {
         
         describe("custom assertions", function(){
 
-            it("should be able to be added via QUnit.specify.extendAssertions with 3 arg asserts", function(){
+            it("should be able to be added via pavlov.extendAssertions with 3 arg asserts", function(){
                 var gtArgs, ltArgs;
-                QUnit.specify.extendAssertions({
+                pavlov.extendAssertions({
                     isGreaterThan: function(actual, expected, message) {
                         gtArgs = $.makeArray(arguments);
                     },
@@ -682,9 +694,9 @@ QUnit.specify("Pavlov", function() {
                 assert(ltArgs).isSameAs([2,4,"some message"]);
             });
 
-            it("should be able to be added via QUnit.specify.extendAssertions with 2 arg asserts", function(){
+            it("should be able to be added via pavlov.extendAssertions with 2 arg asserts", function(){
                 var purpleArgs, yellowArgs;
-                QUnit.specify.extendAssertions({
+                pavlov.extendAssertions({
                     isPurple: function(actual, message) {
                         purpleArgs = $.makeArray(arguments);
                     },

@@ -31,6 +31,7 @@ task :build => [:clean] do
 
   # copy src
   cp 'pavlov.js', 'dist/pavlov.js'
+  cp 'pavlov.qunit.js', 'dist/pavlov.qunit.js'
   
   # copy documentation
   cp 'README.markdown', 'dist/README.markdown'
@@ -56,6 +57,18 @@ task :build => [:clean] do
     combined.puts(header)
     combined.write(minified)  
   end
+  
+  # minify src
+  source = File.read('dist/pavlov.qunit.js')
+  minified = Packr.pack(source, :shrink_vars => true, :base62 => false)
+  header = /\/\*.*?\*\//m.match(source)
+
+  # inject header
+  File.open('dist/pavlov.qunit.min.js', 'w') do |combined|
+    combined.puts(header)
+    combined.write(minified)  
+  end
+  
 end
 
 desc "Generates a releasable zip archive"

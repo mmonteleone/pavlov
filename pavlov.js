@@ -1,12 +1,12 @@
 /**
- * Pavlov - Behavioral API over QUnit
+ * pavlov - Behavioral API over JavaScript Test Frameworks
  * 
- * version 0.2.3
+ * version 0.3.0pre
  * 
  * http://michaelmonteleone.net/projects/pavlov
  * http://github.com/mmonteleone/pavlov
  *
- * Copyright (c) 2009 Michael Monteleone
+ * Copyright (c) 2010 Michael Monteleone
  * Licensed under terms of the MIT License (README.markdown)
  */
 (function(){
@@ -25,9 +25,9 @@
      * @param {Function} callback callback for each iterated item
      */
     var each = function(object, callback) {
-        var name;
-        var i = 0;
-        var length = object.length;
+        var name,
+            i = 0,
+            length = object.length;
 
         if ( length === undefined ) {
             for ( name in object ) {
@@ -50,9 +50,8 @@
      * @returns array
      */
     var makeArray = function(array) {
-        var ret = [];
-
-        var i = array.length;
+        var ret = [],
+            i = array.length;
         while( i ) { ret[--i] = array[i]; }         
         
         return ret;        
@@ -98,8 +97,8 @@
     // = Example Building =
     // ====================
 
-    var examples = [];
-    var currentExample;
+    var examples = [],
+        currentExample;
 
     /**
      * Example Class
@@ -179,61 +178,58 @@
 
     // ==============
     // = Assertions =
-    // ==============
-   
-    /**
-     * Collection of default-bundled assertion implementations
-     */
+    // ==============  
+    
     var assertions = {
         equals: function(actual, expected, message) {
-            equals(actual, expected, message);
+            specify.assert(actual == expected, message);
         },
         isEqualTo: function(actual, expected, message) {
-            equals(actual, expected, message);
+            specify.assert(actual == expected, message);
         },
         isNotEqualTo: function(actual, expected, message) {
-            ok(actual !== expected, message);
+            specify.assert(actual != expected, message);
         },
         isSameAs: function(actual, expected, message) {  
-            same(actual, expected, message);
+            specify.assert(specify.equivalent(actual, expected), message);
         },
         isNotSameAs: function(actual, expected, message) {            
-            ok(!QUnit.equiv(actual, expected), message);
+            specify.assert(!specify.equivalent(actual, expected), message);
         },
         isTrue: function(actual, message) {     
-            ok(actual, message);
+            specify.assert(actual, message);
         },
         isFalse: function(actual, message) {            
-            ok(!actual, message);
+            specify.assert(!actual, message);
         },
         isNull: function(actual, message) {
-            ok(actual === null, message);
+            specify.assert(actual === null, message);
         },
         isNotNull: function(actual, message) {            
-            ok(actual !== null, message);
+            specify.assert(actual !== null, message);
         },
         isDefined: function(actual, message) {
-            ok(typeof(actual) !== 'undefined', message);
+            specify.assert(typeof actual !== 'undefined', message);
         },
         isUndefined: function(actual, message) {
-            ok(typeof(actual) === 'undefined', message);
+            specify.assert(typeof actual === 'undefined', message);
         },
         pass: function(actual, message) {
-            ok(true, message);
+            specify.assert(true, message);
         },
         fail: function(actual, message) {
-            ok(!true, message);
+            specify.assert(!true, message);
         },
         throwsException: function(actual, expectedErrorDescription, message) {
             /* can optionally accept expected error message */
             try{
                 actual();
-                ok(!true, message);
+                specify.assert(!true, message);
             } catch(e) {
                 if(arguments.length > 1) {
-                    ok(e === expectedErrorDescription, message);                        
+                    specify.assert(e === expectedErrorDescription, message);                        
                 } else {
-                    ok(true, message);                        
+                    specify.assert(true, message);                        
                 }
             }                               
         }
@@ -267,13 +263,11 @@
             };
         }); 
     };
-    // pre-add all the default bundled assertions
     addAssertions(assertions);
 
 
-
     // =====================
-    // = Pavlov Public API =
+    // = pavlov Public API =
     // =====================
 
 
@@ -288,7 +282,7 @@
          */
         describe: function(description, fn) {
             if(arguments.length < 2) {
-                throw("both 'description' and 'fn' arguments are required");
+                throw "both 'description' and 'fn' arguments are required";
             }
             
             // capture reference to current example before construction
@@ -310,7 +304,7 @@
          */
         before: function(fn) {
             if(arguments.length === 0) {
-                throw("'fn' argument is required");
+                throw "'fn' argument is required";
             }
             currentExample.before = fn;
         },
@@ -321,7 +315,7 @@
          */
         after: function(fn) {
             if(arguments.length === 0) {
-                throw("'fn' argument is required");
+                throw "'fn' argument is required";
             }
             currentExample.after = fn;
         },
@@ -334,7 +328,7 @@
          */
         it: function(specification, fn) {
             if(arguments.length === 0) {
-                throw("'specification' argument is required");
+                throw "'specification' argument is required";
             }
             thisApi = this;
             if(fn) {
@@ -354,10 +348,10 @@
          */
         given: function() {
             if(arguments.length === 0) {
-                throw("at least one argument is required");
+                throw "at least one argument is required";
             }
-            var args = makeArray(arguments);
-            var thisIt = this.it;
+            var args = makeArray(arguments),
+                thisIt = this.it;
 
             return {
                 /**
@@ -392,12 +386,12 @@
          */
         wait: function(ms, fn) {
             if(arguments.length < 2) {
-                throw("both 'ms' and 'fn' arguments are required");
+                throw "both 'ms' and 'fn' arguments are required";
             }
-            stop();
-            QUnit.specify.globalObject.setTimeout(function(){
+            specify.stop();
+            specify.globalObject.setTimeout(function(){
                 fn();
-                start();
+                specify.start();
             }, ms);
         }
     };
@@ -456,13 +450,13 @@
     };
 
     /**
-     * Top-level Specify method.  Declares a new QUnit.specify context
+     * Top-level Specify method.  Declares a new pavlov context
      * @param {String} name Name of what's being specified
      * @param {Function} fn Function containing exmaples and specs     
      */
     var specify = function(name, fn) {
         if(arguments.length < 2) {
-            throw("both 'name' and 'fn' arguments are required")
+            throw "both 'name' and 'fn' arguments are required";
         }
         examples = [];
         currentExample = null;
@@ -472,11 +466,12 @@
         addEvent(window,'load',function(){            
             // document.getElementsByTag('h1').innerHTML = name;
             var h1s = document.getElementsByTagName('h1');
-            if(h1s.length > 0) 
-                h1s[0].innerHTML = document.title;
+            if(h1s.length > 0){
+                h1s[0].innerHTML = document.title;                
+            }
         });
 
-        if(QUnit.specify.globalApi) { 
+        if(specify.globalApi) { 
             // if set to extend global api, 
             // extend global api and run example builder
             extend(globalScope, api);
@@ -487,90 +482,51 @@
             extendScope(fn, this, api)(); 
         }
 
-        // compile examples into flat qunit statements
-        var qunitStatements = compile(examples);
-
-        // run qunit tests
-        each(qunitStatements, function(){ this(); });
-    };  
-
-
-
-
-    // ==========================================
-    // = Example-to-QUnit Statement Compilation =
-    // ==========================================
-
-    /**
-     * Compiles nested set of examples into flat array of QUnit statements
-     * @param {Array} examples Array of possibly nested Example instances
-     * @returns array of QUnit statements each wrapped in an anonymous fn
-     */
-    var compile = function(examples) {
-        var statements = [];
-
-        /**
-         * Comples a single example and its children into QUnit statements
-         * @param {Example} example Single example instance 
-         * possibly with nested instances
-         */
-        var compileDescription = function(example) {
-            
-            // get before and after rollups
-            var befores = example.befores();
-            var afters = example.afters();
-
-            // create a module with setup and teardown 
-            // that executes all current befores/afters
-            statements.push(function(){
-                module(example.names(), {
-                    setup: function(){
-                        each(befores, function(){ this(); });
-                    },
-                    teardown: function(){
-                        each(afters, function(){ this(); });
-                    }
-                });
-            });
-
-            // create a test for each spec/"it" in the example
-            each(example.specs, function(){
-                var spec = this;
-                statements.push(function(){
-                    test(spec[0],spec[1]);
-                });
-            });
-            
-            // recurse through example's nested examples
-            each(example.children, function() {
-                compileDescription(this);            
-            });
-        };
+        // compile examples into an executable which runs tests in adapter's test framework
+        var executable = specify.compile(examples);
         
-
-        // compile all root examples
-        each(examples, function() {
-            compileDescription(this, statements);
-        });
-
-        return statements;
-    };
-    
+        // run the tests
+        executable();
+    };  
 
     
     // =====================
     // = Expose Public API =
     // =====================
 
-    // extend QUnit
-    QUnit.specify = specify;
-    // add global settings onto QUnit.specify
+    // add global settings onto pavlov
     extend(specify, {
-        version: '0.2.3',
+        version: '0.3.0pre',
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions,  // function for adding custom assertions
-        globalObject: window              // injectable global containing setTimeout and pals
+        globalObject: window,             // injectable global containing setTimeout and pals
+        helpers: {
+            each: each,
+            makeArray: makeArray,
+            isArray: isArray,
+            extend: extend
+        },
+        extend: function(extension) {
+            extend(specify, extension);
+        },
+        assert: function(expr, message) {
+            throw "This function must be overriden by a base truth assertion function within a Test Framework Adapter";
+        },
+        equivalent: function(a, b) {
+            throw "This function must be overriden by an object sameness function  within a Test Framework Adapter";
+        },
+        compile: function(examples) {
+            throw "This function must be overriden by an example-to-test translator function within a Test Framework Adapter";
+        },
+        stop: function() {
+            throw "This function must be overriden by a test runner pausing function within a Test Framework Adapter";
+        },
+        start: function() {
+            throw "This function must be overriden by a test runner starting function within a Test Framework Adapter";
+        }
     });
+    // expose the api as "pavlov"
+    specify.globalObject.pavlov = specify;
 
 })();
 
