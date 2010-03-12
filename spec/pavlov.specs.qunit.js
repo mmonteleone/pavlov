@@ -8,6 +8,31 @@ test("standard QUnit Test should still run alongside pavlov", function() {
     ok(standardQUnitTestRan);
 });
 
+pavlov.extendAssertions({
+    /**
+     * Asserts two arrays contain same values
+     */
+     contentsEqual: function(actual, expected, message){
+        if(actual === null) {
+            throw "Actual argument required";
+        }
+        if(expected === null) {
+            throw "Expected argument required";
+        }
+        if(actual.length !== expected.length) {
+            ok(false, message)
+            return false;
+        }
+        var areEqual = true;
+        for(var i = 0;i < actual.length; i++) {
+            areEqual = areEqual && (expected[i] == actual[i]);
+            if(!areEqual) {
+                break;
+            }
+        }
+        ok(areEqual, message);
+    }
+})
 
 pavlov("Pavlov", function() {
     
@@ -111,13 +136,13 @@ pavlov("Pavlov", function() {
             });
 
             it("should execute all before()s from outside-in", function() {
-                assert(beforeCalls).isSameAs(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'a']);
-                assert(afterCalls).isSameAs(['y', 'y', 'y', 'y', 'y', 'y', 'y']);
+                assert(beforeCalls).contentsEqual(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'a']);
+                assert(afterCalls).contentsEqual(['y', 'y', 'y', 'y', 'y', 'y', 'y']);
             });
 
             it("should execute all after()s from inside-out", function() {
-                assert(beforeCalls).isSameAs(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'a', 'x', 'a']);
-                assert(afterCalls).isSameAs(['y', 'y', 'y', 'y', 'y', 'y', 'y', 'b', 'y']);
+                assert(beforeCalls).contentsEqual(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'a', 'x', 'a']);
+                assert(afterCalls).contentsEqual(['y', 'y', 'y', 'y', 'y', 'y', 'y', 'b', 'y']);
             });
 
             it("should have access to own describe scope", function() {
@@ -217,9 +242,9 @@ pavlov("Pavlov", function() {
                     multiArgGivenCount++;
             });
         });
-
+        
         describe("with a wait()", function() {
-            
+
             it("should throw exception if not passed both fn and ms", function(){
                 assert(function(){
                     wait();                                        
@@ -231,45 +256,25 @@ pavlov("Pavlov", function() {
                     wait(function(){});                                        
                 }).throwsException("both 'ms' and 'fn' arguments are required")
             });
-
-            it("should stop(), run a setTimeout() for duration, then execute lambda and start()", function() {
-                var original = {
-                    stop: stop,
-                    start: start,
-                    setTimeout: window.setTimeout                                        
-                };
-                var calls = [];
-                var setTimeoutMs = 0;
-                var waitLambdaCalled = false;
-
+            
+            it("should call the adapter's wait() method", function(){
+                var originalAdapterWait = pavlov.adapter.wait;
+                var args = [];
+                var callback = function() {};
                 try{
-                    // mock timing functions to capture their calls from wait()
-                    stop = function() { calls.push('stop'); };
-                    start = function() { calls.push('start'); };
-                    window.setTimeout = function(fn, ms) {
-                        calls.push('settimeout');
-                        setTimeoutMs = ms;
-                        fn();
+                    pavlov.adapter.wait = function(ms, fn) {
+                        args.push(ms);
+                        args.push(fn);
                     };
-                    
-                    // call wait
-                    wait(40, function(){
-                        calls.push('waitlambda');
-                    });
-                    
+                    wait(40, callback);
                 } finally {
-                    // undo mocking
-                    stop = original.stop;
-                    start = original.start;
-                    window.setTimeout = original.setTimeout;                                        
-                }
-                
-                // check if calls to mocked fn's occurred correctly
-                assert(calls).isSameAs(['stop','settimeout','waitlambda','start']);
-                assert(setTimeoutMs).equals(40);
+                    pavlov.adapter.wait = originalAdapterWait;
+                }             
+                assert(args).contentsEqual([40, callback]);
             });
 
         });
+        
     });
 
 
@@ -304,7 +309,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([4 === 2,"some message"]);
+                assert(passedArgs).contentsEqual([4 === 2,"some message"]);
             });
 
         });
@@ -318,7 +323,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([4 === 2,"some message"]);
+                assert(passedArgs).contentsEqual([4 === 2,"some message"]);
             });
 
         });
@@ -332,7 +337,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"some message"]);
+                assert(passedArgs).contentsEqual([true,"some message"]);
             });
 
             it("should pass false to qunit's ok() when actual === expected", function() {
@@ -342,91 +347,8 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"some message"]);
+                assert(passedArgs).contentsEqual([false,"some message"]);
             });
-
-        });
-
-        describe("isSameAs()", function() {
-
-            it("should pass arguments to qunit's equiv and result to ok()", function() {
-                var originalEquiv = QUnit.equiv;
-                var calls = [];
-                try {
-                    QUnit.equiv = function(actual, expected) {
-                        calls.push($.makeArray(arguments));
-                        return true;
-                    };
-                    var passedArgs = mockQunitAssertion('ok', function(){
-                        // run spec assertion while underlying qunit assertion is mocked
-                        assert(4).isSameAs(2, "some message");
-                    });
-                }finally{
-                    QUnit.equiv = originalEquiv;    
-                }
-
-                // make sure equiv was called
-                assert(calls).isSameAs([[4,2]]);
-                // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"some message"]);
-            });
-
-        });
-
-        describe("isNotSameAs()", function(){
-            
-            var originalEquiv;
-            var equivActual;
-            var equivExpected;
-            
-            
-            before(function(){
-                originalEquiv = QUnit.equiv;
-                equivActual = null;
-                equivExpected = null;                
-            });
-
-            it("should pass true when !QUnit.equiv of arguments is true to qunit's ok()", function() {
-                try {
-                    QUnit.equiv = function(actual, expected) {
-                        equivActual = actual;
-                        equivExpected = expected;
-                        return false;                        
-                    };
-                    var passedArgs = mockQunitAssertion('ok', function(){
-                        // run spec assertion while underlying qunit assertion is mocked
-                        assert(4).isNotSameAs(2, "some message");
-                    });                    
-                } finally {
-                    QUnit.equiv = originalEquiv;
-                }
-                
-                // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"some message"]);
-                assert(equivActual).equals(4);
-                assert(equivExpected).equals(2);
-            });
-            
-            it("should pass false when !QUnit.equiv of arguments is false to qunit's ok()", function() {
-                try {
-                    QUnit.equiv = function(actual, expected) {
-                        equivActual = actual;
-                        equivExpected = expected;
-                        return true;                        
-                    };
-                    var passedArgs = mockQunitAssertion('ok', function(){
-                        // run spec assertion while underlying qunit assertion is mocked
-                        assert(4).isNotSameAs(2, "some message");
-                    });                    
-                } finally {
-                    QUnit.equiv = originalEquiv;
-                }
-                
-                // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"some message"]);
-                assert(equivActual).equals(4);
-                assert(equivExpected).equals(2);
-            });            
 
         });
 
@@ -439,7 +361,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"some message"]);
+                assert(passedArgs).contentsEqual([true,"some message"]);
             });
 
         });
@@ -453,7 +375,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"some message"]);
+                assert(passedArgs).contentsEqual([true,"some message"]);
             });
 
             it("should pass false to qunit's ok() when expr is true", function() {
@@ -463,7 +385,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"some message"]);
+                assert(passedArgs).contentsEqual([false,"some message"]);
             });
         });
         
@@ -476,7 +398,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);
+                assert(passedArgs).contentsEqual([true,"message"]);
             });
 
             it("should pass false to qunit' ok when actual !== null", function() {
@@ -486,7 +408,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"message"]);
+                assert(passedArgs).contentsEqual([false,"message"]);
             });
 
         });
@@ -500,7 +422,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);
+                assert(passedArgs).contentsEqual([true,"message"]);
             });
 
             it("should pass false to qunit's ok when actual === null", function() {
@@ -510,7 +432,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"message"]);
+                assert(passedArgs).contentsEqual([false,"message"]);
             });
 
         });
@@ -525,7 +447,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);
+                assert(passedArgs).contentsEqual([true,"message"]);
             });
 
             it("should pass false to qunit's ok when typeof(argument) === 'undefined'", function() {
@@ -536,7 +458,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"message"]);
+                assert(passedArgs).contentsEqual([false,"message"]);
             });
 
         });
@@ -551,7 +473,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);
+                assert(passedArgs).contentsEqual([true,"message"]);
             });
 
             it("should pass false to qunit()'s ok when typeof(argument) !== 'undefined'", function() {
@@ -562,7 +484,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"message"]);
+                assert(passedArgs).contentsEqual([false,"message"]);
             });
 
         });
@@ -577,7 +499,7 @@ pavlov("Pavlov", function() {
                 });              
 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);
+                assert(passedArgs).contentsEqual([true,"message"]);
             });
             
             it("should also be called from assert.pass()", function(){
@@ -588,7 +510,7 @@ pavlov("Pavlov", function() {
                 });              
 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);                
+                assert(passedArgs).contentsEqual([true,"message"]);                
                                 
             });
                         
@@ -603,7 +525,7 @@ pavlov("Pavlov", function() {
                 });              
 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"message"]);
+                assert(passedArgs).contentsEqual([false,"message"]);
             });
                         
             it("should also be called from assert.false()", function(){
@@ -614,7 +536,7 @@ pavlov("Pavlov", function() {
                 });              
 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"message"]);                
+                assert(passedArgs).contentsEqual([false,"message"]);                
                                 
             });
                         
@@ -632,7 +554,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,undefined]);
+                assert(passedArgs).contentsEqual([true,undefined]);
             });
             
             it("should pass false to qunit's ok() when function does not throw exception", function(){
@@ -646,7 +568,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,undefined]);                
+                assert(passedArgs).contentsEqual([false,undefined]);                
             });
             
             it("should pass true to qunit's ok() when function throws exception with expected description", function(){
@@ -658,7 +580,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,"message"]);
+                assert(passedArgs).contentsEqual([true,"message"]);
             });
             
             it("should pass false to qunit's ok() when function throws exception with unexpected description", function(){
@@ -670,7 +592,7 @@ pavlov("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,"message"]);                
+                assert(passedArgs).contentsEqual([false,"message"]);                
             });
         });
         
@@ -690,8 +612,8 @@ pavlov("Pavlov", function() {
                 assert(4).isGreaterThan(2,"some message");
                 assert(2).isLessThan(4,"some message");
 
-                assert(gtArgs).isSameAs([4,2,"some message"]);
-                assert(ltArgs).isSameAs([2,4,"some message"]);
+                assert(gtArgs).contentsEqual([4,2,"some message"]);
+                assert(ltArgs).contentsEqual([2,4,"some message"]);
             });
 
             it("should be able to be added via pavlov.extendAssertions with 2 arg asserts", function(){
@@ -708,8 +630,8 @@ pavlov("Pavlov", function() {
                 assert(4).isPurple("some message");
                 assert(2).isYellow("some message");
 
-                assert(purpleArgs).isSameAs([4,"some message"]);
-                assert(yellowArgs).isSameAs([2,"some message"]);
+                assert(purpleArgs).contentsEqual([4,"some message"]);
+                assert(yellowArgs).contentsEqual([2,"some message"]);
             });
 
         });

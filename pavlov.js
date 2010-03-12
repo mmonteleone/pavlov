@@ -76,22 +76,7 @@
             dest[prop] = src[prop];
         }        
     };
-
-    /**
-     * minimalist (and yes, non-optimal/leaky) event binder
-     * not meant for wide use.  only for jquery-less internal use in pavlov
-     * @param {Element} elem Event-triggering Element
-     * @param {String} type name of event
-     * @param {Function} fn callback
-     */
-    var addEvent = function(elem, type, fn){
-        if ( elem.addEventListener ) {
-            elem.addEventListener( type, fn, false );
-        } else if ( elem.attachEvent ) {
-            elem.attachEvent( "on" + type, fn );
-        }
-    };
-    
+        
         
     // ====================
     // = Example Building =
@@ -182,54 +167,48 @@
     
     var assertions = {
         equals: function(actual, expected, message) {
-            specify.assert(actual == expected, message);
+            adapter.assert(actual == expected, message);
         },
         isEqualTo: function(actual, expected, message) {
-            specify.assert(actual == expected, message);
+            adapter.assert(actual == expected, message);
         },
         isNotEqualTo: function(actual, expected, message) {
-            specify.assert(actual != expected, message);
-        },
-        isSameAs: function(actual, expected, message) {  
-            specify.assert(specify.equivalent(actual, expected), message);
-        },
-        isNotSameAs: function(actual, expected, message) {            
-            specify.assert(!specify.equivalent(actual, expected), message);
+            adapter.assert(actual != expected, message);
         },
         isTrue: function(actual, message) {     
-            specify.assert(actual, message);
+            adapter.assert(actual, message);
         },
         isFalse: function(actual, message) {            
-            specify.assert(!actual, message);
+            adapter.assert(!actual, message);
         },
         isNull: function(actual, message) {
-            specify.assert(actual === null, message);
+            adapter.assert(actual === null, message);
         },
         isNotNull: function(actual, message) {            
-            specify.assert(actual !== null, message);
+            adapter.assert(actual !== null, message);
         },
         isDefined: function(actual, message) {
-            specify.assert(typeof actual !== 'undefined', message);
+            adapter.assert(typeof actual !== 'undefined', message);
         },
         isUndefined: function(actual, message) {
-            specify.assert(typeof actual === 'undefined', message);
+            adapter.assert(typeof actual === 'undefined', message);
         },
         pass: function(actual, message) {
-            specify.assert(true, message);
+            adapter.assert(true, message);
         },
         fail: function(actual, message) {
-            specify.assert(!true, message);
+            adapter.assert(!true, message);
         },
         throwsException: function(actual, expectedErrorDescription, message) {
             /* can optionally accept expected error message */
             try{
                 actual();
-                specify.assert(!true, message);
+                adapter.assert(!true, message);
             } catch(e) {
                 if(arguments.length > 1) {
-                    specify.assert(e === expectedErrorDescription, message);                        
+                    adapter.assert(e === expectedErrorDescription, message);                        
                 } else {
-                    specify.assert(true, message);                        
+                    adapter.assert(true, message);                        
                 }
             }                               
         }
@@ -377,22 +356,12 @@
         assert: function(value) {
             return new assertHandler(value);
         },
-
-        /**
-         * specifies test runner to synchronously wait
-         * @param {Number} ms Milliseconds to wait
-         * @param {Function} fn Function to execute after ms has 
-         * passed before resuming
-         */
+        
         wait: function(ms, fn) {
             if(arguments.length < 2) {
                 throw "both 'ms' and 'fn' arguments are required";
-            }
-            specify.stop();
-            specify.globalObject.setTimeout(function(){
-                fn();
-                specify.start();
-            }, ms);
+            }            
+            adapter.wait(ms, fn);
         }
     };
 
@@ -462,14 +431,10 @@
         currentExample = null;
 
         // set the test suite title
-        document.title = name + " Specifications";
-        addEvent(window,'load',function(){            
-            // document.getElementsByTag('h1').innerHTML = name;
-            var h1s = document.getElementsByTagName('h1');
-            if(h1s.length > 0){
-                h1s[0].innerHTML = document.title;                
-            }
-        });
+        name += " Specifications";
+        
+        // run the adapter initiation
+        adapter.initiate(name);
 
         if(specify.globalApi) { 
             // if set to extend global api, 
@@ -483,12 +448,53 @@
         }
 
         // compile examples into an executable which runs tests in adapter's test framework
-        var executable = specify.compile(examples);
+        var executable = adapter.compile(name, examples);
         
         // run the tests
         executable();
     };  
 
+    // ====================================
+    // = Test Framework Adapter Interface =
+    // ====================================
+
+    // abstracts functionality of underlying testing framework
+    var adapter = {
+        /**
+         * adapter-specific initialization code
+         * which is called once before any tests are run
+         * @param {String} suiteName name of the pavlov suite name
+         */
+        initiate: function(suiteName) { },
+        /**
+         * specifies test runner to synchronously wait
+         * @param {Number} ms Milliseconds to wait
+         * @param {Function} fn Function to execute after ms has 
+         * passed before resuming
+         */
+        wait: function(fn, ms) { 
+            throw "'wait' not implemented by test framework adapter";            
+        },
+        /**
+         * adapter-specific assertion method
+         * @param {bool} expr Boolean expression to assert against
+         * @param {String} message message to pass along with assertion
+         */
+        assert: function(expr, message) {
+            throw "'assert' must be implemented by a test framework adapter";
+        },
+        /**
+         * adapter-specific compilation method.  Translates a nested set of 
+         * pre-constructed Pavlov example objects into a callable function which, when run
+         * will execute the tests within the backedn test framework
+         * @param {String} suiteName name of overall test suite
+         * @param {Array} examples Array of example object instances, possibly nesteds
+         */
+        compile: function(suiteName, examples) {
+            throw "'compile' must be implemented by a test framework adapter";
+        }        
+    };
+            
     
     // =====================
     // = Expose Public API =
@@ -497,36 +503,21 @@
     // add global settings onto pavlov
     extend(specify, {
         version: '0.3.0pre',
-        globalApi: false,                 // when true, adds api to global scope
-        extendAssertions: addAssertions,  // function for adding custom assertions
-        globalObject: window,             // injectable global containing setTimeout and pals
-        helpers: {
+        adapter: adapter,
+        adapt: function(frameworkName, testFrameworkAdapter) {
+            adapter.name = frameworkName;
+            extend(adapter, testFrameworkAdapter);
+        },
+        util: {
             each: each,
-            makeArray: makeArray,
-            isArray: isArray,
             extend: extend
         },
-        extend: function(extension) {
-            extend(specify, extension);
-        },
-        assert: function(expr, message) {
-            throw "This function must be overriden by a base truth assertion function within a Test Framework Adapter";
-        },
-        equivalent: function(a, b) {
-            throw "This function must be overriden by an object sameness function  within a Test Framework Adapter";
-        },
-        compile: function(examples) {
-            throw "This function must be overriden by an example-to-test translator function within a Test Framework Adapter";
-        },
-        stop: function() {
-            throw "This function must be overriden by a test runner pausing function within a Test Framework Adapter";
-        },
-        start: function() {
-            throw "This function must be overriden by a test runner starting function within a Test Framework Adapter";
-        }
+        globalApi: false,                 // when true, adds api to global scope
+        extendAssertions: addAssertions,  // function for adding custom assertions
+        global: window              // injectable global containing setTimeout and pals
     });
     // expose the api as "pavlov"
-    specify.globalObject.pavlov = specify;
+    specify.global.pavlov = specify;
 
 })();
 

@@ -14,33 +14,53 @@
 /**
  * QUnit adapter for Pavlov to allow Pavlov examples to be run against QUnit
  */
-pavlov.extend({
+pavlov.adapt("QUnit", {
+    initiate: function(name) {
+        document.title = name;
+        
+        var addEvent = function(elem, type, fn){
+            if ( elem.addEventListener ) {
+                elem.addEventListener( type, fn, false );
+            } else if ( elem.attachEvent ) {
+                elem.attachEvent( "on" + type, fn );
+            }
+        };
+        
+        // after suite loads, set the header on the report page
+        addEvent(window,'load',function(){            
+            // document.getElementsByTag('h1').innerHTML = name;
+            var h1s = document.getElementsByTagName('h1');
+            if(h1s.length > 0){
+                h1s[0].innerHTML = document.title;                
+            }
+        });        
+    },
+    /**
+     * specifies test runner to synchronously wait
+     * @param {Number} ms Milliseconds to wait
+     * @param {Function} fn Function to execute after ms has 
+     * passed before resuming
+     */
+    wait: function(ms, fn) {
+        stop();
+        pavlov.global.setTimeout(function(){
+            fn();
+            start();
+        }, ms);        
+    },
     /**
      * Implements assert against QUnit's `ok`
      */
     assert: function(expr, msg) { ok(expr, msg); },
-    /**
-     * Implements equivalence checking against `QUnit.equiv`
-     */
-    equivalent: function(a, b) { return QUnit.equiv(a, b); },    
-    /**
-     * Implementes async start against QUnit's `start`
-     */
-    start: function() { start(); },
-    /**
-     * Implements async stop against QUnit's `stop`
-     */
-    stop: function(){ stop(); },
-
     /**
      * Compiles nested set of examples into flat array of QUnit statements
      * returned bound up in a single callable function 
      * @param {Array} examples Array of possibly nested Example instances
      * @returns function of which, when called, will execute all translated QUnit statements
      */
-    compile: function(examples) {
+    compile: function(name, examples) {
         var statements = [],
-            each = pavlov.helpers.each;
+            each = pavlov.util.each;
 
         /**
          * Comples a single example and its children into QUnit statements

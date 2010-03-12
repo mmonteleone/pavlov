@@ -91,10 +91,10 @@ desc "Run the tests in default browser"
 task :test => [:build] do  
   begin
     # mac
-    sh("open spec/pavlov.specs.html")
+    sh("open spec/pavlov.specs.qunit.html")
   rescue
     # windows
-    sh("start spec/pavlov.specs.html")
+    sh("start spec/pavlov.specs.qunit.html")
   end
 end
 
