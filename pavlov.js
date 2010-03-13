@@ -500,7 +500,7 @@
         },
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions,  // function for adding custom assertions
-        global: window                    // injectable global containing setTimeout and pals        
+        global: window                    // injectable global containing setTimeout and pals
     };
 })();
 

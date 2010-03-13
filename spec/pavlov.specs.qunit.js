@@ -20,7 +20,7 @@ pavlov.extendAssertions({
             throw "Expected argument required";
         }
         if(actual.length !== expected.length) {
-            ok(false, message)
+            ok(false, message);
             return false;
         }
         var areEqual = true;
@@ -32,7 +32,7 @@ pavlov.extendAssertions({
         }
         ok(areEqual, message);
     }
-})
+});
 
 pavlov.specify("Pavlov", function() {
 
@@ -100,13 +100,13 @@ pavlov.specify("Pavlov", function() {
         it("should throw exception when before() not passed an fn", function(){
             assert(function(){
                 before();
-            }).throwsException("'fn' argument is required")
+            }).throwsException("'fn' argument is required");
         });
 
         it("should throw exception when after() not passed an fn", function(){
             assert(function(){
                 after();
-            }).throwsException("'fn' argument is required")
+            }).throwsException("'fn' argument is required");
         });
 
         it("should execute lambda", function() {
@@ -174,7 +174,7 @@ pavlov.specify("Pavlov", function() {
 
             it("should generate a failing (todo) test when not passed a lambda", function(){
                 var originalIt = it;
-                var args;
+                var args, failMessage = null;
                 try{
                     // mock up an it
                     // when passed single arg, let Pavlov do it's job (to test it)
@@ -195,7 +195,6 @@ pavlov.specify("Pavlov", function() {
                     var todoGeneratingFn = args[1];
 
                     var originalFail = assert.fail;
-                    var failMessage = null;
                     try
                     {
                         assert.fail = function(message) {

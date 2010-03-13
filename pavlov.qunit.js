@@ -36,8 +36,8 @@ pavlov.adapt("QUnit", {
     /**
      * Implements assert against QUnit's `ok`
      */
-    assert: function(expr, msg) { 
-        ok(expr, msg); 
+    assert: function(expr, msg) {
+        ok(expr, msg);
     },
     /**
      * Compiles nested set of examples into flat array of QUnit statements
