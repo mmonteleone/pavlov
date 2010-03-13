@@ -34,20 +34,20 @@ pavlov.extendAssertions({
     }
 })
 
-pavlov("Pavlov", function() {
+pavlov.specify("Pavlov", function() {
 
     describe("a pavlov()", function() {
         it("should throw exception if name or fn params not passed", function(){
             assert(function(){
-                pavlov(function(){});
+                pavlov.specify(function(){});
             }).throwsException("both 'name' and 'fn' arguments are required");
             assert(function(){
-                pavlov("description");
+                pavlov.specify("description");
             }).throwsException("both 'name' and 'fn' arguments are required");
         });
 
-        it("should set the document title to spec name + ' Specifications'", function() {
-            assert($(document).attr('title')).isEqualTo("Pavlov Specifications");
+        it("should set the document title to spec name + ' Specifications - Pavlov - QUnit'", function() {
+            assert($(document).attr('title')).isEqualTo("Pavlov Specifications - Pavlov - QUnit");
         });
 
         it("should run the spec lambda", function() {
@@ -61,7 +61,7 @@ pavlov("Pavlov", function() {
         });
 
         it("should not pollute the global namespace", function() {
-            $.each("describe,it,wait,assert,before,after,given".split(','), function() {
+            $.each("describe,it,assert,before,after,given".split(','), function() {
                 assert(window[String(this)]).isUndefined();
             });
         });
@@ -242,39 +242,6 @@ pavlov("Pavlov", function() {
                     multiArgGivenCount++;
             });
         });
-
-        describe("with a wait()", function() {
-
-            it("should throw exception if not passed both fn and ms", function(){
-                assert(function(){
-                    wait();
-                }).throwsException("both 'ms' and 'fn' arguments are required")
-                assert(function(){
-                    wait(54);
-                }).throwsException("both 'ms' and 'fn' arguments are required")
-                assert(function(){
-                    wait(function(){});
-                }).throwsException("both 'ms' and 'fn' arguments are required")
-            });
-
-            it("should call the adapter's wait() method", function(){
-                var originalAdapterWait = pavlov.adapter.wait;
-                var args = [];
-                var callback = function() {};
-                try{
-                    pavlov.adapter.wait = function(ms, fn) {
-                        args.push(ms);
-                        args.push(fn);
-                    };
-                    wait(40, callback);
-                } finally {
-                    pavlov.adapter.wait = originalAdapterWait;
-                }
-                assert(args).contentsEqual([40, callback]);
-            });
-
-        });
-
     });
 
 

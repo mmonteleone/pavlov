@@ -1,4 +1,4 @@
-pavlov("Pavlov Example", function(){
+pavlov.specify("Pavlov Example", function(){
     
     describe("A feature that is being described", function(){
         
@@ -13,7 +13,7 @@ pavlov("Pavlov Example", function(){
         });
         
         it("can be specified like so", function(){
-            assert(foo).equals('bar');            
+            assert(foo).equals('bar');
         });
         
         given([2,2,4], [5,2,7], [6,-4,2]).

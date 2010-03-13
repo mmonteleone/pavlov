@@ -355,13 +355,6 @@
          */
         assert: function(value) {
             return new assertHandler(value);
-        },
-
-        wait: function(ms, fn) {
-            if(arguments.length < 2) {
-                throw "both 'ms' and 'fn' arguments are required";
-            }
-            adapter.wait(ms, fn);
         }
     };
 
@@ -432,6 +425,7 @@
 
         // set the test suite title
         name += " Specifications";
+        document.title = name + ' - Pavlov - ' + adapter.name;
 
         // run the adapter initiation
         adapter.initiate(name);
@@ -467,15 +461,6 @@
          */
         initiate: function(suiteName) { },
         /**
-         * specifies test runner to synchronously wait
-         * @param {Number} ms Milliseconds to wait
-         * @param {Function} fn Function to execute after ms has
-         * passed before resuming
-         */
-        wait: function(fn, ms) {
-            throw "'wait' not implemented by test framework adapter";
-        },
-        /**
          * adapter-specific assertion method
          * @param {bool} expr Boolean expression to assert against
          * @param {String} message message to pass along with assertion
@@ -501,8 +486,9 @@
     // =====================
 
     // add global settings onto pavlov
-    extend(specify, {
+    window.pavlov = {
         version: '0.3.0pre',
+        specify: specify,
         adapter: adapter,
         adapt: function(frameworkName, testFrameworkAdapter) {
             adapter.name = frameworkName;
@@ -514,10 +500,7 @@
         },
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions,  // function for adding custom assertions
-        global: window              // injectable global containing setTimeout and pals
-    });
-    // expose the api as "pavlov"
-    specify.global.pavlov = specify;
-
+        global: window                    // injectable global containing setTimeout and pals        
+    };
 })();
 

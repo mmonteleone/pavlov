@@ -43,7 +43,7 @@ task :build => [:clean] do
   cp 'spec/lib/jquery/MIT-LICENSE.txt', 'dist/lib/MIT-LICENSE.txt'
   
   # copy example
-  cp 'example/example.specs.html', 'dist/example/example.specs.html'
+  cp 'example/example.specs.qunit.html', 'dist/example/example.specs.qunit.html'
   cp 'example/example.specs.js', 'dist/example/example.specs.js'
 
   

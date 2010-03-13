@@ -16,8 +16,6 @@
  */
 pavlov.adapt("QUnit", {
     initiate: function(name) {
-        document.title = name;
-
         var addEvent = function(elem, type, fn){
             if ( elem.addEventListener ) {
                 elem.addEventListener( type, fn, false );
@@ -31,27 +29,16 @@ pavlov.adapt("QUnit", {
             // document.getElementsByTag('h1').innerHTML = name;
             var h1s = document.getElementsByTagName('h1');
             if(h1s.length > 0){
-                h1s[0].innerHTML = document.title;
+                h1s[0].innerHTML = name;
             }
         });
     },
     /**
-     * specifies test runner to synchronously wait
-     * @param {Number} ms Milliseconds to wait
-     * @param {Function} fn Function to execute after ms has
-     * passed before resuming
-     */
-    wait: function(ms, fn) {
-        stop();
-        pavlov.global.setTimeout(function(){
-            fn();
-            start();
-        }, ms);
-    },
-    /**
      * Implements assert against QUnit's `ok`
      */
-    assert: function(expr, msg) { ok(expr, msg); },
+    assert: function(expr, msg) { 
+        ok(expr, msg); 
+    },
     /**
      * Compiles nested set of examples into flat array of QUnit statements
      * returned bound up in a single callable function
@@ -114,4 +101,4 @@ pavlov.adapt("QUnit", {
 });
 
 // alias pavlov as QUnit.specify for legacy support
-QUnit.specify = pavlov;
+QUnit.specify = pavlov.specify;
