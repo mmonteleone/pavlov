@@ -39,6 +39,13 @@ pavlov.adapt("QUnit", {
     assert: function(expr, msg) {
         ok(expr, msg);
     },
+    wait: function(ms, fn) {
+        stop();
+        pavlov.global.setTimeout(function(){
+            fn();
+            start();
+        }, ms);
+    },
     /**
      * Compiles nested set of examples into flat array of QUnit statements
      * returned bound up in a single callable function

@@ -260,6 +260,37 @@ pavlov.specify("Pavlov", function() {
                     multiArgGivenCount++;
             });
         });
+        
+        describe("with a wait()", function() {
+
+            it("should throw exception if not passed both fn and ms", function() {
+                assert(function() {
+                    wait();
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+                assert(function() {
+                    wait(54);
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+                assert(function() {
+                    wait(function() {});
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+            });
+            
+            it("should call test framework adapter's wait()", function(){
+                var originalWait = pavlov.adapter.wait;
+                var calls = [];
+                var callback = function() { };
+                try {
+                    pavlov.adapter.wait = function(ms, fn) {
+                        calls.push(ms);
+                        calls.push(fn);
+                    };
+                    wait(30, callback);
+                } finally {
+                    pavlov.adapter.wait = originalWait;
+                }
+                assert(calls).contentsEqual([30, callback]);
+            });
+        });        
     });
 
 

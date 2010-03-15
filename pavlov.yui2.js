@@ -14,79 +14,97 @@
 /**
  * YUI Test adapter for Pavlov to allow Pavlov examples to be run against YUI Test
  */
-pavlov.adapt("YUI 2", {
-    initiate: function(name) {
-        
-    },
-    /**
-     * Implements assert
-     */
-    assert: function(expr, msg) {
-        // run the assertion against the YAHOO namespace
-        YAHOO.util.Assert.isTrue(expr, msg);        
-    },
-    /**
-     * Compiles nested set of examples into flat array of test cases
-     * returned bound up in a single callable function
-     * @param {Array} examples Array of possibly nested Example instances
-     * @returns function of which, when called, will execute all YUI Test test cases
-     */
-    compile: function(name, examples) {
-        
-        return function() {
-            var each = pavlov.util.each,
-                suite = new YAHOO.tool.TestSuite(name);
+ (function(){
+     // holds captured local references to yui cases' "wait" 
+     // methods so that pavlov's wait() can proxy it
+     var currentWaitFunction;
+     
+     pavlov.adapt("YUI 2", {
+         initiate: function(name) {
 
-            /**
-             * Comples a single example and its children into YUI Test test cases
-             * @param {Example} example Single example instance
-             * possibly with nested instances
-             */
-            var compileDescription = function(example) {
-                // get before and after rollups
-                var befores = example.befores(),
-                    afters = example.afters();
+         },
+         /**
+          * Implements assert
+          */
+         assert: function(expr, msg) {
+             // run the assertion against the YAHOO namespace
+             YAHOO.util.Assert.isTrue(expr, msg);        
+         },
+         /**
+          * Implements wait against the current yui test case's native wait()
+          * @param {Number} ms milliseconds to pause the test runner
+          * @param {Function} fn callback to run after resuming test runner
+          */
+         wait: function(ms, fn) {
+             // proxy against the current capatured test cases's wait method
+             currentWaitFunction(fn, ms);
+         },         
+         /**
+          * Compiles nested set of examples into flat array of test cases
+          * returned bound up in a single callable function
+          * @param {Array} examples Array of possibly nested Example instances
+          * @returns function of which, when called, will execute all YUI Test test cases
+          */
+         compile: function(name, examples) {
 
-                // prepare template for test case
-                var template = {
-                    name: example.names(),
-                    setUp: function() {
-                        each(befores, function() { this(); });
-                    },
-                    tearDown: function() {
-                        each(afters, function() { this(); });
-                    }
-                };
+             return function() {
+                 var each = pavlov.util.each,
+                     suite = new YAHOO.tool.TestSuite(name);
 
-                // attach each "it" examples to template
-                each(example.specs, function() {
-                    template['test: ' + example.names() + " " + this[0]] = this[1];
-                });
+                 /**
+                  * Comples a single example and its children into YUI Test test cases
+                  * @param {Example} example Single example instance
+                  * possibly with nested instances
+                  */
+                 var compileDescription = function(example) {
+                     // get before and after rollups
+                     var befores = example.befores(),
+                         afters = example.afters();
 
-                // create test case and attach it to test cases
-                suite.add(new YAHOO.tool.TestCase(template));
+                     // prepare template for test case
+                     var template = {
+                         name: example.names(),
+                         setUp: function() {
+                             // capture a local reference to the case's "wait" 
+                             // method so that pavlov's wait() can proxy it
+                             currentWaitFunction = this.wait;
+                             each(befores, function() { this(); });
+                         },
+                         tearDown: function() {
+                             each(afters, function() { this(); });
+                         }
+                     };
 
-                // recurse through example's nested examples
-                each(example.children, function() {
-                    compileDescription(this);
-                });
-            };
+                     // attach each "it" examples to template
+                     each(example.specs, function() {
+                         template['test: ' + example.names() + " " + this[0]] = this[1];
+                     });
 
-            // compile all root examples
-            each(examples, function() {
-                compileDescription(this);
-            });
+                     // create test case and attach it to test cases
+                     suite.add(new YAHOO.tool.TestCase(template));
 
-            YAHOO.util.Event.onDOMReady(function (){
-                //create the logger
-                var logger = new YAHOO.tool.TestLogger();
+                     // recurse through example's nested examples
+                     each(example.children, function() {
+                         compileDescription(this);
+                     });
+                 };
 
-                //add the test suite to the runner's queue
-                YAHOO.tool.TestRunner.add(suite);
+                 // compile all root examples
+                 each(examples, function() {
+                     compileDescription(this);
+                 });
 
-                //run the tests
-                YAHOO.tool.TestRunner.run();
-            });            
-        };
-    }
-});
+                 YAHOO.util.Event.onDOMReady(function (){
+                     //create the logger
+                     var logger = new YAHOO.tool.TestLogger();
+
+                     //add the test suite to the runner's queue
+                     YAHOO.tool.TestRunner.add(suite);
+
+                     //run the tests
+                     YAHOO.tool.TestRunner.run();
+                 });            
+             };
+         }
+     });
+})();

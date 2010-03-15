@@ -243,6 +243,78 @@ pavlov.specify("Pavlov", function() {
                     multiArgGivenCount++;
             });
         });
+        
+        describe("with a wait()", function() {
+
+            it("should throw exception if not passed both fn and ms", function() {
+                assert(function() {
+                    wait();
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+                assert(function() {
+                    wait(54);
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+                assert(function() {
+                    wait(function() {});
+                }).throwsException("both 'ms' and 'fn' arguments are required")
+            });
+            
+            it("should call test framework adapter's wait()", function(){
+                var originalWait = pavlov.adapter.wait;
+                var calls = [];
+                var callback = function() { };
+                try {
+                    pavlov.adapter.wait = function(ms, fn) {
+                        calls.push(ms);
+                        calls.push(fn);
+                    };
+                    wait(30, callback);
+                } finally {
+                    pavlov.adapter.wait = originalWait;
+                }
+                assert(calls).contentsEqual([30, callback]);
+            });
+
+            it("should stop(), run a setTimeout() for duration, then execute lambda and start()", function() {
+                var original = {
+                    stop: stop,
+                    start: start,
+                    setTimeout: window.setTimeout
+                };
+                var calls = [];
+                var setTimeoutMs = 0;
+                var waitLambdaCalled = false;
+
+                try {
+                    // mock timing functions to capture their calls from wait()
+                    stop = function() {
+                        calls.push('stop');
+                    };
+                    start = function() {
+                        calls.push('start');
+                    };
+                    window.setTimeout = function(fn, ms) {
+                        calls.push('settimeout');
+                        setTimeoutMs = ms;
+                        fn();
+                    };
+
+                    // call wait
+                    wait(40, function() {
+                        calls.push('waitlambda');
+                    });
+
+                } finally {
+                    // undo mocking
+                    stop = original.stop;
+                    start = original.start;
+                    window.setTimeout = original.setTimeout;
+                }
+
+                // check if calls to mocked fn's occurred correctly
+                assert(calls).contentsEqual(['stop', 'settimeout', 'waitlambda', 'start']);
+                assert(setTimeoutMs).equals(40);
+            });
+        });        
     });
 
 

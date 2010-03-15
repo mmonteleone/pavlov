@@ -361,6 +361,18 @@
          */
         assert: function(value) {
             return new assertHandler(value);
+        },
+        /**
+         * specifies test runner to synchronously wait
+         * @param {Number} ms Milliseconds to wait
+         * @param {Function} fn Function to execute after ms has 
+         * passed before resuming
+         */
+         wait: function(ms, fn) {
+            if(arguments.length < 2) {
+                throw("both 'ms' and 'fn' arguments are required");
+            }                        
+            adapter.wait(ms, fn);
         }
     };
 
@@ -483,6 +495,15 @@
          */
         compile: function(suiteName, examples) {
             throw "'compile' must be implemented by a test framework adapter";
+        },
+        /**
+         * adapter-specific async wait method.  When an adapter implements,
+         * allows for test runner to pause
+         * @param {Number} ms milliseconds to pause test runner
+         * @@param {Function} fn callback to run after pausing
+         */
+        wait: function(ms, fn) { 
+            throw "'wait' not implemented by current test framework adapter";
         }
     };
 

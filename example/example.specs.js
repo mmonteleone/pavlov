@@ -26,6 +26,16 @@ pavlov.specify("Pavlov Example", function(){
                 throw "Exception!";
             }).throwsException();
         });
+        
+        it("can pause the test runner while waiting for async", function(){
+            var waited = false;
+            setTimeout(function(){
+                waited = true;
+            }, 50);
+            wait(60, function(){
+                assert(waited).isTrue();  
+            });
+        });
 
         describe("can also have nested examples", function(){
 
