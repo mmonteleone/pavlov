@@ -14,7 +14,7 @@
 /**
  * YUI Test adapter for Pavlov to allow Pavlov examples to be run against YUI Test
  */
-pavlov.adapt("YUI 3 Test", {
+pavlov.adapt("YUI 3", {
     initiate: function(name) {
         var self = this;
         YUI().use("test", function(Y) { self.Y = Y; });

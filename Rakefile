@@ -7,7 +7,7 @@ require 'find'
 require 'fileutils'
 include FileUtils
 
-task :default => :test
+task :default => "test:adapter:qunit"
 
 # list of browsers to auto-bind to JsTestDrive Server
 # non-existent browsers will be ignored
@@ -32,6 +32,7 @@ task :build => [:clean] do
   # copy src
   cp 'pavlov.js', 'dist/pavlov.js'
   cp 'pavlov.qunit.js', 'dist/pavlov.qunit.js'
+  cp 'pavlov.yui3.js', 'dist/pavlov.yui3.js'
 
   # copy documentation
   cp 'README.markdown', 'dist/README.markdown'
@@ -44,31 +45,26 @@ task :build => [:clean] do
 
   # copy example
   cp 'example/example.specs.qunit.html', 'dist/example/example.specs.qunit.html'
+  cp 'example/example.specs.yui3.html', 'dist/example/example.specs.yui3.html'
   cp 'example/example.specs.js', 'dist/example/example.specs.js'
 
+  # minify 
+  minify('dist/pavlov.js')  
+  minify('dist/pavlov.qunit.js')
+  minify('dist/pavlov.yui3.js')
+end
 
+def minify(file)
   # minify src
-  source = File.read('dist/pavlov.js')
+  source = File.read(file)
   minified = Packr.pack(source, :shrink_vars => true, :base62 => false)
   header = /\/\*.*?\*\//m.match(source)
 
   # inject header
-  File.open('dist/pavlov.min.js', 'w') do |combined|
+  File.open(file.slice(0, file.length - 3) + '.min.js', 'w') do |combined|
     combined.puts(header)
     combined.write(minified)
   end
-
-  # minify src
-  source = File.read('dist/pavlov.qunit.js')
-  minified = Packr.pack(source, :shrink_vars => true, :base62 => false)
-  header = /\/\*.*?\*\//m.match(source)
-
-  # inject header
-  File.open('dist/pavlov.qunit.min.js', 'w') do |combined|
-    combined.puts(header)
-    combined.write(minified)
-  end
-
 end
 
 desc "Generates a releasable zip archive"
@@ -85,19 +81,33 @@ task :release => [:build] do
   end
 end
 
+namespace :test do 
+  namespace :adapter do
+    
+    desc "Run the qunit tests in default browser"
+    task :qunit => [:build] do
+      begin
+        # mac
+        sh("open spec/pavlov.specs.qunit.html")
+      rescue
+        # windows
+        sh("start spec/pavlov.specs.qunit.html")
+      end
+    end
 
-
-desc "Run the tests in default browser"
-task :test => [:build] do
-  begin
-    # mac
-    sh("open spec/pavlov.specs.qunit.html")
-  rescue
-    # windows
-    sh("start spec/pavlov.specs.qunit.html")
+    desc "Run the yui3 tests in default browser"
+    task :yui3 => [:build] do
+      begin
+        # mac
+        sh("open spec/pavlov.specs.yui3.html")
+      rescue
+        # windows
+        sh("start spec/pavlov.specs.yui3.html")
+      end
+    end
+    
   end
 end
-
 
 desc "Run the tests against JsTestDriver"
 task :testdrive => [:build] do
