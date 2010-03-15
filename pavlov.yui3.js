@@ -16,14 +16,16 @@
  */
 pavlov.adapt("YUI 3", {
     initiate: function(name) {
-        var self = this;
-        YUI().use("test", function(Y) { self.Y = Y; });
+        // allow a test suite to have possibly pre-injected a YUI instance into the 
+        // adapter.  Otherwise, build a defalt one.
+        pavlov.adapter.YUI = pavlov.adapter.YUI || YUI();
     },
     /**
      * Implements assert
      */
     assert: function(expr, msg) {
-        this.Y.assert(expr, msg);
+        // run the assertion against the YUI instance in the adapter
+        pavlov.adapter.YUI.assert(expr, msg);
     },
     /**
      * Compiles nested set of examples into flat array of test cases
@@ -33,7 +35,8 @@ pavlov.adapt("YUI 3", {
      */
     compile: function(name, examples) {
         return function() {
-            YUI().use("console", "test", function(Y) {
+            // compile and run tests in context of the YUI instance in the adapter
+            pavlov.adapter.YUI.use("console","test", function(Y) {
                 var each = pavlov.util.each,
                     suite = new Y.Test.Suite(name);
 

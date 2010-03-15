@@ -7,7 +7,7 @@ require 'find'
 require 'fileutils'
 include FileUtils
 
-task :default => "test:adapter:qunit"
+task :default => "test:qunit"
 
 # list of browsers to auto-bind to JsTestDrive Server
 # non-existent browsers will be ignored
@@ -67,6 +67,16 @@ def minify(file)
   end
 end
 
+def browse(path)
+  begin
+    # mac
+    sh("open #{path}")
+  rescue
+    # windows
+    sh("start #{path}")
+  end  
+end
+
 desc "Generates a releasable zip archive"
 task :release => [:build] do
   root = pwd+'/dist'
@@ -81,31 +91,27 @@ task :release => [:build] do
   end
 end
 
-namespace :test do 
-  namespace :adapter do
-    
-    desc "Run the qunit tests in default browser"
-    task :qunit => [:build] do
-      begin
-        # mac
-        sh("open spec/pavlov.specs.qunit.html")
-      rescue
-        # windows
-        sh("start spec/pavlov.specs.qunit.html")
-      end
-    end
+namespace :example do
+  desc "Run the qunit example in default browser"
+  task :qunit => [:build] do
+    browse "example/example.specs.qunit.html"
+  end
 
-    desc "Run the yui3 tests in default browser"
-    task :yui3 => [:build] do
-      begin
-        # mac
-        sh("open spec/pavlov.specs.yui3.html")
-      rescue
-        # windows
-        sh("start spec/pavlov.specs.yui3.html")
-      end
-    end
-    
+  desc "Run the yui3 example in default browser"
+  task :yui3 => [:build] do
+    browse "example/example.specs.yui3.html"
+  end  
+end
+
+namespace :test do 
+  desc "Run the qunit tests in default browser"
+  task :qunit => [:build] do
+    browse "spec/pavlov.specs.qunit.html" 
+  end
+
+  desc "Run the yui3 tests in default browser"
+  task :yui3 => [:build] do
+    browse "spec/pavlov.specs.yui3.html"
   end
 end
 

@@ -22,34 +22,34 @@ YUI({ combine: true, timeout: 10000 }).use("node", "console", "test", function(Y
 
     Y.Test.Runner.add(Y.example.test.ExampleSuite);
     Y.Test.Runner.run();
-
-    pavlov.extendAssertions({
-        /**
-       * Asserts two arrays contain same values
-       */
-        contentsEqual: function(actual, expected, message) {
-            if (actual === null) {
-                throw "Actual argument required";
-            }
-            if (expected === null) {
-                throw "Expected argument required";
-            }
-            if (actual.length !== expected.length) {
-                Y.assert(false, message);
-                return false;
-            }
-            var areEqual = true;
-            for (var i = 0; i < actual.length; i++) {
-                areEqual = areEqual && (expected[i] == actual[i]);
-                if (!areEqual) {
-                    break;
-                }
-            }
-            Y.assert(areEqual, message);
-        }
-    });
 });
 
+pavlov.extendAssertions({
+    /**
+   * Asserts two arrays contain same values
+   */
+    contentsEqual: function(actual, expected, message) {
+        var Y = pavlov.adapter.YUI;
+        if (actual === null) {
+            throw "Actual argument required";
+        }
+        if (expected === null) {
+            throw "Expected argument required";
+        }
+        if (actual.length !== expected.length) {
+            pavlov.adapter.YUI.assert(false, message);
+            return false;
+        }
+        var areEqual = true;
+        for (var i = 0; i < actual.length; i++) {
+            areEqual = areEqual && (expected[i] == actual[i]);
+            if (!areEqual) {
+                break;
+            }
+        }
+        Y.assert(areEqual, message);
+    }
+});
 
 pavlov.specify("Pavlov", function() {
 
@@ -270,15 +270,15 @@ pavlov.specify("Pavlov", function() {
          * undoes mocking after scope completes
          */
         var mockYuiAssertion = function(method, scope) {
-            var originalMethod = pavlov.adapter.Y[method];
+            var originalMethod = pavlov.adapter.YUI[method];
             var args = [];
             try {
-                pavlov.adapter.Y[method] = function() {
+                pavlov.adapter.YUI[method] = function() {
                     args = $.makeArray(arguments);
                 };
                 scope();
             } finally {
-                pavlov.adapter.Y[method] = originalMethod;
+                pavlov.adapter.YUI[method] = originalMethod;
             }
             return args;
         };
