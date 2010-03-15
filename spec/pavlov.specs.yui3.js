@@ -52,6 +52,8 @@ pavlov.extendAssertions({
 });
 
 pavlov.specify("Pavlov", function() {
+    var each = pavlov.util.each,
+        makeArray = pavlov.util.makeArray;
 
     describe("a pavlov.specify()", function() {
         it("should throw exception if name or fn params not passed", function(){
@@ -64,7 +66,7 @@ pavlov.specify("Pavlov", function() {
         });
 
         it("should set the document title to spec name + ' Specifications - Pavlov - YUI 3'", function() {
-            assert($(document).attr('title')).isEqualTo("Pavlov Specifications - Pavlov - YUI 3");
+            assert(document.title).isEqualTo("Pavlov Specifications - Pavlov - YUI 3");
         });
 
         it("should run the spec lambda", function() {
@@ -78,7 +80,7 @@ pavlov.specify("Pavlov", function() {
         });
 
         it("should not pollute the global namespace", function() {
-            $.each("describe,it,assert,before,after,given".split(','), function() {
+            each("describe,it,assert,before,after,given".split(','), function() {
                 assert(window[String(this)]).isUndefined();
             });
         });
@@ -200,7 +202,7 @@ pavlov.specify("Pavlov", function() {
                     // later, will verify the correct behavior happened with 1 arg.
                     it = function() {
                         if(arguments.length === 2) {
-                            args = $.makeArray(arguments);
+                            args = makeArray(arguments);
                         } else {
                             originalIt.apply(this,arguments);
                         }
@@ -274,7 +276,7 @@ pavlov.specify("Pavlov", function() {
             var args = [];
             try {
                 pavlov.adapter.YUI[method] = function() {
-                    args = $.makeArray(arguments);
+                    args = makeArray(arguments);
                 };
                 scope();
             } finally {
@@ -651,10 +653,10 @@ pavlov.specify("Pavlov", function() {
                 var gtArgs, ltArgs;
                 pavlov.extendAssertions({
                     isGreaterThan: function(actual, expected, message) {
-                        gtArgs = $.makeArray(arguments);
+                        gtArgs = makeArray(arguments);
                     },
                     isLessThan: function(actual, expected, message) {
-                        ltArgs = $.makeArray(arguments);
+                        ltArgs = makeArray(arguments);
                     }
                 });
 
@@ -669,10 +671,10 @@ pavlov.specify("Pavlov", function() {
                 var purpleArgs, yellowArgs;
                 pavlov.extendAssertions({
                     isPurple: function(actual, message) {
-                        purpleArgs = $.makeArray(arguments);
+                        purpleArgs = makeArray(arguments);
                     },
                     isYellow: function(actual, message) {
-                        yellowArgs = $.makeArray(arguments);
+                        yellowArgs = makeArray(arguments);
                     }
                 });
 
