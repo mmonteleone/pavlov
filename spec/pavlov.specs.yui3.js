@@ -63,8 +63,8 @@ pavlov.specify("Pavlov", function() {
             }).throwsException("both 'name' and 'fn' arguments are required");
         });
 
-        it("should set the document title to spec name + ' Specifications - Pavlov - YUI 3 Test'", function() {
-            assert($(document).attr('title')).isEqualTo("Pavlov Specifications - Pavlov - YUI 3 Test");
+        it("should set the document title to spec name + ' Specifications - Pavlov - YUI 3'", function() {
+            assert($(document).attr('title')).isEqualTo("Pavlov Specifications - Pavlov - YUI 3");
         });
 
         it("should run the spec lambda", function() {
