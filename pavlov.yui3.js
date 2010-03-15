@@ -1,6 +1,6 @@
 /**
  * pavlov - Behavioral API over JavaScript Test Frameworks
- * YUI Test adapter
+ * YUI 3 Test adapter
  *
  * version 0.3.0pre
  *

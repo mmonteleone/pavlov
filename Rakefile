@@ -33,6 +33,7 @@ task :build => [:clean] do
   cp 'pavlov.js', 'dist/pavlov.js'
   cp 'pavlov.qunit.js', 'dist/pavlov.qunit.js'
   cp 'pavlov.yui3.js', 'dist/pavlov.yui3.js'
+  cp 'pavlov.yui2.js', 'dist/pavlov.yui2.js'
 
   # copy documentation
   cp 'README.markdown', 'dist/README.markdown'
@@ -46,12 +47,14 @@ task :build => [:clean] do
   # copy example
   cp 'example/example.specs.qunit.html', 'dist/example/example.specs.qunit.html'
   cp 'example/example.specs.yui3.html', 'dist/example/example.specs.yui3.html'
+  cp 'example/example.specs.yui2.html', 'dist/example/example.specs.yui2.html'
   cp 'example/example.specs.js', 'dist/example/example.specs.js'
 
   # minify 
   minify('dist/pavlov.js')  
   minify('dist/pavlov.qunit.js')
   minify('dist/pavlov.yui3.js')
+  minify('dist/pavlov.yui2.js')
 end
 
 def minify(file)
@@ -101,6 +104,11 @@ namespace :example do
   task :yui3 => [:build] do
     browse "example/example.specs.yui3.html"
   end  
+
+  desc "Run the yui2 example in default browser"
+  task :yui2 => [:build] do
+    browse "example/example.specs.yui2.html"
+  end  
 end
 
 namespace :test do 
@@ -112,6 +120,11 @@ namespace :test do
   desc "Run the yui3 tests in default browser"
   task :yui3 => [:build] do
     browse "spec/pavlov.specs.yui3.html"
+
+  end
+  desc "Run the yui2 tests in default browser"
+  task :yui2 => [:build] do
+    browse "spec/pavlov.specs.yui2.html"
   end
 end
 
