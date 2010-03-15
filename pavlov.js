@@ -175,6 +175,12 @@
         isNotEqualTo: function(actual, expected, message) {
             adapter.assert(actual != expected, message);
         },
+        isSameAs: function(actual, expected, message) {
+            adapter.assert(actual === expected, message);
+        },
+        isNotSameAs: function(actual, expected, message) {
+            adapter.assert(actual !== expected, message);
+        },
         isTrue: function(actual, message) {
             adapter.assert(actual, message);
         },

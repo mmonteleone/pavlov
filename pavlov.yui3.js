@@ -16,7 +16,7 @@
  */
 pavlov.adapt("YUI 3", {
     initiate: function(name) {
-        // allow a test suite to have possibly pre-injected a YUI instance into the 
+        // allow a test suite to have possibly pre-injected a YUI instance into the
         // adapter.  Otherwise, build a defalt one.
         pavlov.adapter.YUI = pavlov.adapter.YUI || YUI();
     },
