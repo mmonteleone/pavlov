@@ -164,7 +164,6 @@
     // ==============
     // = Assertions =
     // ==============
-
     var assertions = {
         equals: function(actual, expected, message) {
             adapter.assert(actual == expected, message);
@@ -208,14 +207,13 @@
         throwsException: function(actual, expectedErrorDescription, message) {
             /* can optionally accept expected error message */
             try{
-                actual();
-                adapter.assert(!true, message);
+                actual();                
+                adapter.assert(!true, message);                
             } catch(e) {
-                if(arguments.length > 1) {
-                    adapter.assert(e === expectedErrorDescription, message);
-                } else {
-                    adapter.assert(true, message);
-                }
+                // so, this bit of weirdness is basically a way to allow for the fact
+                // that the test may have specified a particular type of error to catch, or not.
+                // and if not, e would always === e.  
+                adapter.assert(e === (expectedErrorDescription || e), message);
             }
         }
     };
@@ -231,12 +229,37 @@
     var assertHandler = function(value) {
         this.value = value;
     };
+    
+    /**
+     * Naive display formatter for objects which wraps the objects'
+     * own toString() value with type-specific delimiters.
+     * [] for array
+     * "" for string
+     * Does not currently go nearly detailed enough for JSON use, 
+     * just enough to show small values within test results
+     * @param {Object} obj object to format
+     * @returns naive display-formatted string representation of the object
+     */
+    var format = function(obj) {
+        if(typeof obj === 'undefined') {
+            return "";
+        } else if(Object.prototype.toString.call(obj) === "[object Array]") {
+            return '[' + obj.toString() + ']';
+        } else if(Object.prototype.toString.call(obj) === "[object Function]") {
+            return "function()";
+        } else if(typeof obj == "string") {
+            return '"' + obj + '"';
+        } else {
+            return obj;
+        }
+    };
+    
     /**
      * Appends assertion methods to the assertHandler prototype
      * For each provided assertion implementation, adds an identically named
      * assertion function to assertionHandler prototype which can run impl
      * @param {Object} asserts Object containing assertion implementations
-     */
+     */     
     var addAssertions = function(asserts) {
         each(asserts, function(name, fn){
             assertHandler.prototype[name] = function() {
@@ -244,7 +267,17 @@
                 // by pre-pending assertHandler's current value to args
                 var args =  makeArray(arguments);
                 args.unshift(this.value);
-                fn.apply(this, args);
+                
+                // if no explicit message was given with the assertion, 
+                // then let's build our own friendly one 
+                if(fn.length === 2) {
+                    args[1] = args[1] || 'asserting ' + format(args[0]) + ' ' + name;
+                } else if(fn.length === 3) {
+                    var expected = format(args[1]);
+                    args[2] = args[2] || 'asserting ' + format(args[0]) + ' ' + name + (expected ? ' ' + expected : expected);
+                }
+                
+                fn.apply(this, args);                
             };
         });
     };

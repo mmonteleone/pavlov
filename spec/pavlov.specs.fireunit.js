@@ -1,43 +1,25 @@
-var standardYUI3TestRan = false;
+var standardFireUnitTestRan = false;
+fireunit.group("standard FireUnit group");
+fireunit.ok((function(){ 
+	standardFireUnitTestRan = true; 
+	return standardFireUnitTestRan; 
+})(), "standard FireUnit Test should still run alongside pavlov");
+fireunit.groupEnd();
 
-YUI({ combine: true, timeout: 10000 }).use("node", "console", "test", function(Y) {
-    Y.namespace("example.test");
-    Y.example.test.DataTestCase = new Y.Test.Case({
-        name: "Example tests",
-        testName: function() {
-            standardYUI3TestRan = true;
-            Y.assert(true);
-        }
-    });
-
-    Y.example.test.ExampleSuite = new Y.Test.Suite("Example Suite");
-    Y.example.test.ExampleSuite.add(Y.example.test.DataTestCase);
-
-    //create the console
-    var r = new Y.Console({
-        newestOnTop: false,
-        style: 'block'
-    });
-    r.render('#testLogger');
-
-    Y.Test.Runner.add(Y.example.test.ExampleSuite);
-    Y.Test.Runner.run();
-});
 
 pavlov.extendAssertions({
     /**
    * Asserts two arrays contain same values
    */
     contentsEqual: function(actual, expected, message) {
-        var Y = pavlov.adapter.YUI;
         if (actual === null) {
             throw "Actual argument required";
         }
         if (expected === null) {
             throw "Expected argument required";
         }
-        if (actual.length !== expected.length) {
-            pavlov.adapter.YUI.assert(false, message);
+        if (actual.length !== expected.length) {            
+            pavlov.adapter.assert(false, message);
             return false;
         }
         var areEqual = true;
@@ -47,14 +29,14 @@ pavlov.extendAssertions({
                 break;
             }
         }
-        Y.assert(areEqual, message);
+        pavlov.adapter.assert(areEqual, message);
     }
 });
 
 pavlov.specify("Pavlov", function() {
     var each = pavlov.util.each,
         makeArray = pavlov.util.makeArray;
-
+    
     describe("a pavlov.specify()", function() {
         it("should throw exception if name or fn params not passed", function(){
             assert(function(){
@@ -65,8 +47,8 @@ pavlov.specify("Pavlov", function() {
             }).throwsException("both 'name' and 'fn' arguments are required");
         });
 
-        it("should set the document title to spec name + ' Specifications - Pavlov - YUI 3'", function() {
-            assert(document.title).isEqualTo("Pavlov Specifications - Pavlov - YUI 3");
+        it("should set the document title to spec name + ' Specifications - Pavlov - FireUnit'", function() {
+            assert(document.title).isEqualTo("Pavlov Specifications - Pavlov - FireUnit");
         });
 
         it("should run the spec lambda", function() {
@@ -74,22 +56,22 @@ pavlov.specify("Pavlov", function() {
             assert.pass();
         });
 
-        it("should run the resulting flattened yui3 tests", function() {
+        it("should run the resulting flattened fireunit tests", function() {
             // implicitly true by virtue of having executed
             assert.pass();
         });
 
-        it("should not pollute the global namespace", function() {
-            each("describe,it,assert,before,after,given".split(','), function() {
-                assert(window[String(this)]).isUndefined();
-            });
-        });
+		given("describe","it","assert","before","after","given")
+			.it("should not pollute the global namespace", function(name) {
+				assert(window[name]).isUndefined();
+			});
 
-        it("should be able to run alongside standard YUI3 modules and tests", function() {
-            assert(standardYUI3TestRan).isTrue();
+        it("should be able to run alongside standard fireunit tests", function() {
+            assert(standardFireUnitTestRan).isTrue();
         });
     });
-
+	
+	
     describe("a describe()", function() {
         var variableDefinedInDescribe = "y";
         var beforeCalls = [];
@@ -176,7 +158,8 @@ pavlov.specify("Pavlov", function() {
         it("should have access to describe scope", function() {
             assert(variableDefinedInDescribe).isDefined();
         });
-    });
+    });	
+	
 
     describe("an it()", function() {
         it("should throw exception if not passed at least a specification", function(){
@@ -294,7 +277,6 @@ pavlov.specify("Pavlov", function() {
     });
 
 
-
     describe("assertions", function() {
 
         /* quick and dirty mocking of native yui test functions
@@ -302,16 +284,16 @@ pavlov.specify("Pavlov", function() {
          * that just gathers and returns the values of passed arguments
          * undoes mocking after scope completes
          */
-        var mockYuiAssertion = function(method, scope) {
-            var originalMethod = pavlov.adapter.YUI[method];
+        var mockFireUnitAssertion = function(method, scope) {
+            var originalMethod = fireunit[method];
             var args = [];
             try {
-                pavlov.adapter.YUI[method] = function() {
+                fireunit[method] = function() {
                     args = makeArray(arguments);
                 };
                 scope();
             } finally {
-                pavlov.adapter.YUI[method] = originalMethod;
+                fireunit[method] = originalMethod;
             }
             return args;
         };
@@ -319,7 +301,7 @@ pavlov.specify("Pavlov", function() {
         describe("equals()", function() {
 
             it("should pass true to yui's assert when expected == actual", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(1).isEqualTo(true, "some message");
                 });
@@ -329,7 +311,7 @@ pavlov.specify("Pavlov", function() {
             });
 
             it("should pass false to yui's assert when expected != actual", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(1).isEqualTo(2, "some message");
                 });
@@ -343,7 +325,7 @@ pavlov.specify("Pavlov", function() {
         describe("isEqualTo()", function() {
 
             it("should pass true to yui's assert when expected == actual", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(1).isEqualTo(true, "some message");
                 });
@@ -353,7 +335,7 @@ pavlov.specify("Pavlov", function() {
             });
 
             it("should pass false to yui's assert when expected != actual", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(1).isEqualTo(2, "some message");
                 });
@@ -366,7 +348,7 @@ pavlov.specify("Pavlov", function() {
         describe("isNotEqualTo()", function(){
 
             it("should pass true to yui's assert() when actual != expected", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(4).isNotEqualTo(2, "some message");
                 });
@@ -376,7 +358,7 @@ pavlov.specify("Pavlov", function() {
             });
 
             it("should pass false to yui's assert() when actual == expected", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(2).isNotEqualTo(2, "some message");
                 });
@@ -390,7 +372,7 @@ pavlov.specify("Pavlov", function() {
         describe("isSameAs()", function() {
 
             it("should pass true to yui's assert when expected === actual", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(8).isSameAs(8, "some message");
                 });
@@ -400,7 +382,7 @@ pavlov.specify("Pavlov", function() {
             });
 
             it("should pass false to yui's assert when expected !== actual", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(1).isSameAs(true, "some message");
                 });
@@ -413,7 +395,7 @@ pavlov.specify("Pavlov", function() {
         describe("isNotSameAs()", function(){
 
             it("should pass true to yui's assert() when actual !== expected", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(1).isNotSameAs(true, "some message");
                 });
@@ -423,7 +405,7 @@ pavlov.specify("Pavlov", function() {
             });
 
             it("should pass false to yui's assert() when actual === expected", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
                     // run spec assertion while underlying yui assertion is mocked
                     assert(2).isNotSameAs(2, "some message");
                 });
@@ -436,13 +418,13 @@ pavlov.specify("Pavlov", function() {
 
         describe("isTrue()", function() {
 
-            it("should pass argument to yui3's assert()", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass argument to fireunit's assert()", function() {
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(true).isTrue("some message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"some message"]);
             });
 
@@ -450,46 +432,46 @@ pavlov.specify("Pavlov", function() {
 
         describe("isFalse()", function(){
 
-            it("should pass true to yui3's assert() when expr is false", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass true to fireunit's assert() when expr is false", function() {
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(false).isFalse("some message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"some message"]);
             });
 
-            it("should pass false to yui3's assert() when expr is true", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass false to fireunit's assert() when expr is true", function() {
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(true).isFalse("some message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"some message"]);
             });
         });
 
         describe("isNull()", function() {
 
-            it("should pass true to yui3' assert when actual === null", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass true to fireunit' assert when actual === null", function() {
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(null).isNull("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"message"]);
             });
 
-            it("should pass false to yui3' assert when actual !== null", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass false to fireunit' assert when actual !== null", function() {
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(0).isNull("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"message"]);
             });
 
@@ -497,23 +479,23 @@ pavlov.specify("Pavlov", function() {
 
         describe("isNotNull()", function(){
 
-            it("should pass true to yui3's assert when actual !== null", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass true to fireunit's assert when actual !== null", function() {
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(0).isNotNull("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"message"]);
             });
 
-            it("should pass false to yui3's assert when actual === null", function() {
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass false to fireunit's assert when actual === null", function() {
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(null).isNotNull("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"message"]);
             });
 
@@ -521,25 +503,25 @@ pavlov.specify("Pavlov", function() {
 
         describe("isDefined()", function() {
 
-            it("should pass true to yui3's assert when typeof(argument) !== 'undefined'", function() {
+            it("should pass true to fireunit's assert when typeof(argument) !== 'undefined'", function() {
                 var x = "something";
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(x).isDefined("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"message"]);
             });
 
-            it("should pass false to yui3's assert when typeof(argument) === 'undefined'", function() {
+            it("should pass false to fireunit's assert when typeof(argument) === 'undefined'", function() {
                 var x;
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(x).isDefined("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"message"]);
             });
 
@@ -547,25 +529,25 @@ pavlov.specify("Pavlov", function() {
 
         describe("isUndefined()", function(){
 
-            it("should pass true to yui3()'s assert when typeof(argument) === 'undefined'", function() {
+            it("should pass true to fireunit()'s assert when typeof(argument) === 'undefined'", function() {
                 var x;
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(x).isUndefined("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"message"]);
             });
 
-            it("should pass false to yui3()'s assert when typeof(argument) !== 'undefined'", function() {
+            it("should pass false to fireunit()'s assert when typeof(argument) !== 'undefined'", function() {
                 var x = 1;
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(x).isUndefined("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"message"]);
             });
 
@@ -574,24 +556,24 @@ pavlov.specify("Pavlov", function() {
 
         describe("pass()", function(){
 
-            it("should pass true to yui3's assert()", function(){
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass true to fireunit's assert()", function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert().pass("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"message"]);
             });
 
             it("should also be called from assert.pass()", function(){
 
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert.pass("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"message"]);
 
             });
@@ -600,24 +582,24 @@ pavlov.specify("Pavlov", function() {
 
         describe("fail()", function(){
 
-            it("should pass false to yui3's assert()", function(){
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass false to fireunit's assert()", function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert().fail("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"message"]);
             });
 
             it("should also be called from assert.false()", function(){
 
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert.fail("message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"message"]);
 
             });
@@ -626,22 +608,22 @@ pavlov.specify("Pavlov", function() {
 
         describe("throwsException()", function(){
 
-            it("should pass true to yui3's assert() when function throws exception", function(){
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass true to qunit's ok() when function throws exception", function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
                     assert(function(){
                         // should throw undefined exceptions
                         var totalPrice = unitPrice * quantity;
                     }).throwsException();
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to qunit
                 assert(passedArgs).contentsEqual([true,"asserting function() throwsException"]);
             });
 
-            it("should pass false to yui3's assert() when function does not throw exception", function(){
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass false to qunit's ok() when function does not throw exception", function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
                     assert(function(){
                         var unitPrice = 10;
                         var quantity = 4;
@@ -649,31 +631,31 @@ pavlov.specify("Pavlov", function() {
                     }).throwsException();
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to qunit
                 assert(passedArgs).contentsEqual([false,"asserting function() throwsException"]);
             });
 
-            it("should pass true to yui3's assert() when function throws exception with expected description", function(){
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass true to fireunit's assert() when function throws exception with expected description", function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(function(){
                         throw("expected description");
                     }).throwsException("expected description", "message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([true,"message"]);
             });
 
-            it("should pass false to yui3's assert() when function throws exception with unexpected description", function(){
-                var passedArgs = mockYuiAssertion('assert', function(){
-                    // run spec assertion while underlying yui3 assertion is mocked
+            it("should pass false to fireunit's assert() when function throws exception with unexpected description", function(){
+                var passedArgs = mockFireUnitAssertion('ok', function(){
+                    // run spec assertion while underlying fireunit assertion is mocked
                     assert(function(){
                         throw("some other error description");
                     }).throwsException("expected description", "message");
                 });
 
-                // verify correct arguments would have been passed to yui3
+                // verify correct arguments would have been passed to fireunit
                 assert(passedArgs).contentsEqual([false,"message"]);
             });
         });
@@ -717,5 +699,5 @@ pavlov.specify("Pavlov", function() {
             });
 
         });
-    });
+    });	
 });
