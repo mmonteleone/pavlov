@@ -255,6 +255,16 @@
     };
     
     /**
+     * transforms a camel or pascal case string 
+     * to all lower-case space-separated phrase
+     * @param {string} value pascal or camel-cased string
+     * @returns all-lower-case space-separated phrase
+     */
+    var letterCase = function(value) {
+        return value.replace(/([A-Z])/g,' $1').toLowerCase();
+    };
+    
+    /**
      * Appends assertion methods to the assertHandler prototype
      * For each provided assertion implementation, adds an identically named
      * assertion function to assertionHandler prototype which can run impl
@@ -271,10 +281,10 @@
                 // if no explicit message was given with the assertion, 
                 // then let's build our own friendly one 
                 if(fn.length === 2) {
-                    args[1] = args[1] || 'asserting ' + format(args[0]) + ' ' + name;
+                    args[1] = args[1] || 'asserting ' + format(args[0]) + ' ' + letterCase(name);
                 } else if(fn.length === 3) {
                     var expected = format(args[1]);
-                    args[2] = args[2] || 'asserting ' + format(args[0]) + ' ' + name + (expected ? ' ' + expected : expected);
+                    args[2] = args[2] || 'asserting ' + format(args[0]) + ' ' + letterCase(name) + (expected ? ' ' + expected : expected);
                 }
                 
                 fn.apply(this, args);                

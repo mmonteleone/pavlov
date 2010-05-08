@@ -660,7 +660,7 @@ pavlov.specify("Pavlov", function() {
                 });
 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).contentsEqual([true,"asserting function() throwsException"]);
+                assert(passedArgs).contentsEqual([true,"asserting function() throws exception"]);
             });
 
             it("should pass false to qunit's ok() when function does not throw exception", function(){
@@ -674,7 +674,7 @@ pavlov.specify("Pavlov", function() {
                 });
 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).contentsEqual([false,"asserting function() throwsException"]);
+                assert(passedArgs).contentsEqual([false,"asserting function() throws exception"]);
             });
 
             it("should pass true to qunit's ok() when function throws exception with expected description", function(){
