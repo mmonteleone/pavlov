@@ -436,7 +436,7 @@
         // get a string of the fn's parameters
         var params = fn.toString().match(/\(([^\)]*)\)/)[1];
         // get a string of fn's body
-        var source = fn.toString().match(/^[^\{]*\{((.*\n*)*)\}/m)[1];
+        var source = fn.toString().match(/^[^\{]*\{((.*\s*)*)\}/m)[1];
 
         // create a new function with same parameters and
         // body wrapped in a with(extraScope){ }
