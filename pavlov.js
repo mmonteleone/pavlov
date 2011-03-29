@@ -1,8 +1,8 @@
 /**
  * Pavlov - Behavioral API over QUnit
- * 
+ *
  * version 0.2.3
- * 
+ *
  * http://michaelmonteleone.net/projects/pavlov
  * http://github.com/mmonteleone/pavlov
  *
@@ -10,15 +10,15 @@
  * Licensed under terms of the MIT License (README.markdown)
  */
 (function(){
-    // capture reference to global scope 
+    // capture reference to global scope
     var globalScope = this;
-    
+
     // ===========
     // = Helpers =
     // ===========
-    
+
     // Trimmed versions of jQuery helpers for use only within pavlov
-    
+
     /**
      * Iterates over an object or array
      * @param {Object|Array} object object or array to iterate
@@ -37,13 +37,13 @@
             }
         } else {
             for ( var value = object[0];
-                i < length && callback.call( value, i, value ) !== false; 
+                i < length && callback.call( value, i, value ) !== false;
                 value = object[++i] ) {}
         }
 
-        return object;        
+        return object;
     };
-    
+
     /**
      * converts an array-like object to an array
      * @param {Object} array array-like object
@@ -53,20 +53,20 @@
         var ret = [];
 
         var i = array.length;
-        while( i ) { ret[--i] = array[i]; }         
-        
-        return ret;        
+        while( i ) { ret[--i] = array[i]; }
+
+        return ret;
     };
-    
+
     /**
      * returns whether or not an object is an array
      * @param {Object} obj object to test
      * @returns whether or not object is array
      */
     var isArray = function(obj) {
-        return Object.prototype.toString.call(obj) === "[object Array]";        
+        return Object.prototype.toString.call(obj) === "[object Array]";
     };
-    
+
     /**
      * merges properties form one object to another
      * @param {Object} dest object to receive merged properties
@@ -75,7 +75,7 @@
     var extend = function(dest, src) {
         for(var prop in src) {
             dest[prop] = src[prop];
-        }        
+        }
     };
 
     /**
@@ -92,8 +92,8 @@
             elem.attachEvent( "on" + type, fn );
         }
     };
-    
-        
+
+
     // ====================
     // = Example Building =
     // ====================
@@ -108,7 +108,7 @@
      * exposes methods for returning combined lists of before, after, and names
      * @constructor
      * @param {example} parent example to append self as child to (optional)
-     */    
+     */
     function example(parent) {
         // private
 
@@ -120,7 +120,7 @@
             examples.push(this);
         }
 
-        var thisExample = this;        
+        var thisExample = this;
 
         /**
          * Rolls up list of current and ancestors values for given prop name
@@ -138,7 +138,7 @@
         };
 
         // public
-        
+
         // parent example
         this.parent = parent ? parent : null;
         // nested examples
@@ -154,7 +154,7 @@
 
         /**
          * rolls up this and ancestor's before functions
-         * @returns arrayt of functions                  
+         * @returns arrayt of functions
          */
         this.befores = function(){
             return rollup('before').reverse();
@@ -167,20 +167,20 @@
             return rollup('after');
         };
         /**
-         * Rolls up this and ancestor's description names, joined 
+         * Rolls up this and ancestor's description names, joined
          * @returns string of joined description names
          */
         this.names = function(){
-            return rollup('name').reverse().join(', ');     
+            return rollup('name').reverse().join(', ');
         };
     }
-    
+
 
 
     // ==============
     // = Assertions =
     // ==============
-   
+
     /**
      * Collection of default-bundled assertion implementations
      */
@@ -194,22 +194,22 @@
         isNotEqualTo: function(actual, expected, message) {
             ok(actual !== expected, message);
         },
-        isSameAs: function(actual, expected, message) {  
+        isSameAs: function(actual, expected, message) {
             same(actual, expected, message);
         },
-        isNotSameAs: function(actual, expected, message) {            
+        isNotSameAs: function(actual, expected, message) {
             ok(!QUnit.equiv(actual, expected), message);
         },
-        isTrue: function(actual, message) {     
+        isTrue: function(actual, message) {
             ok(actual, message);
         },
-        isFalse: function(actual, message) {            
+        isFalse: function(actual, message) {
             ok(!actual, message);
         },
         isNull: function(actual, message) {
             ok(actual === null, message);
         },
-        isNotNull: function(actual, message) {            
+        isNotNull: function(actual, message) {
             ok(actual !== null, message);
         },
         isDefined: function(actual, message) {
@@ -232,15 +232,15 @@
             } catch(e) {
                 // so, this bit of weirdness is basically a way to allow for the fact
                 // that the test may have specified a particular type of error to catch, or not.
-                // and if not, e would always === e.  
-                ok(e === (expectedErrorDescription || e), message);                
-            }                               
+                // and if not, e would always === e.
+                ok(e === (expectedErrorDescription || e), message);
+            }
         }
     };
 
     /**
      * AssertionHandler
-     * represents instance of an assertion regarding a particular 
+     * represents instance of an assertion regarding a particular
      * actual value, and provides an api around asserting that value
      * against any of the bundled assertion handlers and custom ones.
      * @constructor
@@ -249,13 +249,13 @@
     var assertHandler = function(value) {
         this.value = value;
     };
-    
+
     /**
      * Naive display formatter for objects which wraps the objects'
      * own toString() value with type-specific delimiters.
      * [] for array
      * "" for string
-     * Does not currently go nearly detailed enough for JSON use, 
+     * Does not currently go nearly detailed enough for JSON use,
      * just enough to show small values within test results
      * @param {Object} obj object to format
      * @returns naive display-formatted string representation of the object
@@ -273,17 +273,17 @@
             return obj;
         }
     };
-    
+
     /**
-     * transforms a camel or pascal case string 
+     * transforms a camel or pascal case string
      * to all lower-case space-separated phrase
      * @param {string} value pascal or camel-cased string
      * @returns all-lower-case space-separated phrase
      */
     var letterCase = function(value) {
         return value.replace(/([A-Z])/g,' $1').toLowerCase();
-    };    
-        
+    };
+
     /**
      * Appends assertion methods to the assertHandler prototype
      * For each provided assertion implementation, adds an identically named
@@ -296,10 +296,10 @@
                 // implement this handler against backend
                 // by pre-pending assertHandler's current value to args
                 var args =  makeArray(arguments);
-                args.unshift(this.value);           
+                args.unshift(this.value);
 
-                // if no explicit message was given with the assertion, 
-                // then let's build our own friendly one 
+                // if no explicit message was given with the assertion,
+                // then let's build our own friendly one
                 if(fn.length === 2) {
                     args[1] = args[1] || 'asserting ' + format(args[0]) + ' ' + letterCase(name);
                 } else if(fn.length === 3) {
@@ -307,9 +307,9 @@
                     args[2] = args[2] || 'asserting ' + format(args[0]) + ' ' + letterCase(name) + (expected ? ' ' + expected : expected);
                 }
 
-                fn.apply(this, args);                
+                fn.apply(this, args);
             };
-        }); 
+        });
     };
     // pre-add all the default bundled assertions
     addAssertions(assertions);
@@ -334,23 +334,23 @@
             if(arguments.length < 2) {
                 throw("both 'description' and 'fn' arguments are required");
             }
-            
+
             // capture reference to current example before construction
             var originalExample = currentExample;
             try{
                 // create new current example for construction
                 currentExample = new example(currentExample);
                 currentExample.name = description;
-                fn();        
+                fn();
             } finally {
                 // restore original reference after construction
                 currentExample = originalExample;
             }
-        }, 
+        },
 
         /**
          * Sets a function to occur before all contained specs and nested examples' specs
-         * @param {Function} fn Function to be executed         
+         * @param {Function} fn Function to be executed
          */
         before: function(fn) {
             if(arguments.length === 0) {
@@ -358,10 +358,10 @@
             }
             currentExample.before = fn;
         },
-        
+
         /**
          * Sets a function to occur after all contained tests and nested examples' tests
-         * @param {Function} fn Function to be executed         
+         * @param {Function} fn Function to be executed
          */
         after: function(fn) {
             if(arguments.length === 0) {
@@ -369,7 +369,7 @@
             }
             currentExample.after = fn;
         },
-        
+
         /**
          * Creates a spec (test) to occur within an example
          * When not passed fn, creates a spec-stubbing fn which asserts fail "Not Implemented"
@@ -389,9 +389,9 @@
         },
 
         /**
-         * Generates a row spec for each argument passed, applying 
+         * Generates a row spec for each argument passed, applying
          * each argument to a new call against the spec
-         * @returns an object with an it() function for defining 
+         * @returns an object with an it() function for defining
          * function to be called for each of given's arguments
          * @param {Array} arguments either list of values or list of arrays of values
          */
@@ -407,16 +407,16 @@
                  * of the given's arguments.
                  */
                 it: function(specification, fn) {
-                    each(args, function(){                        
-                        var arg = this;   
-                        api.it("given " + arg + ", " + specification, function(){ 
+                    each(args, function(){
+                        var arg = this;
+                        api.it("given " + arg + ", " + specification, function(){
                             fn.apply(this, isArray(arg) ? arg : [arg]);
                         });
                     });
                 }
             };
         },
-        
+
         /**
          * Assert a value against any of the bundled or custom assertions
          * @param {Object} value A value to be asserted
@@ -429,7 +429,7 @@
         /**
          * specifies test runner to synchronously wait
          * @param {Number} ms Milliseconds to wait
-         * @param {Function} fn Function to execute after ms has 
+         * @param {Function} fn Function to execute after ms has
          * passed before resuming
          */
         wait: function(ms, fn) {
@@ -470,7 +470,7 @@
      * @param {Function} fn Target function for extending
      * @param {Object} thisArg Object for the function's "this" to refer
      * @param {Object} extraScope object whose members will be added to fn's scope
-     * @returns Modified version of original function with extra scope.  Can still 
+     * @returns Modified version of original function with extra scope.  Can still
      * accept parameters of original function
      */
     var extendScope = function(fn, thisArg, extraScope) {
@@ -483,12 +483,12 @@
         // create a new function with same parameters and
         // body wrapped in a with(extraScope){ }
         fn = new Function(
-            "extraScope" + (params ?  ", " + params : ""), 
+            "extraScope" + (params ?  ", " + params : ""),
             "with(extraScope){" + source + "}");
-        
-        // returns a fn wrapper which takes passed args, 
+
+        // returns a fn wrapper which takes passed args,
         // pre-pends extraScope arg, and applies to modified fn
-        return function(){ 
+        return function(){
             var args = [extraScope];
             each(arguments,function(){
                 args.push(this);
@@ -500,7 +500,7 @@
     /**
      * Top-level Specify method.  Declares a new QUnit.specify context
      * @param {String} name Name of what's being specified
-     * @param {Function} fn Function containing exmaples and specs     
+     * @param {Function} fn Function containing exmaples and specs
      */
     var specify = function(name, fn) {
         if(arguments.length < 2) {
@@ -511,22 +511,22 @@
 
         // set the test suite title
         document.title = name + " Specifications";
-        addEvent(window,'load',function(){            
+        addEvent(window,'load',function(){
             // document.getElementsByTag('h1').innerHTML = name;
             var h1s = document.getElementsByTagName('h1');
-            if(h1s.length > 0) 
+            if(h1s.length > 0)
                 h1s[0].innerHTML = document.title;
         });
 
-        if(QUnit.specify.globalApi) { 
-            // if set to extend global api, 
+        if(QUnit.specify.globalApi) {
+            // if set to extend global api,
             // extend global api and run example builder
             extend(globalScope, api);
-            fn(); 
-        } else { 
+            fn();
+        } else {
             // otherwise, extend example builder's scope with api
             // and run example builder
-            extendScope(fn, this, api)(); 
+            extendScope(fn, this, api)();
         }
 
         // compile examples into flat qunit statements
@@ -534,7 +534,7 @@
 
         // run qunit tests
         each(qunitStatements, function(){ this(); });
-    };  
+    };
 
 
 
@@ -553,16 +553,16 @@
 
         /**
          * Comples a single example and its children into QUnit statements
-         * @param {Example} example Single example instance 
+         * @param {Example} example Single example instance
          * possibly with nested instances
          */
         var compileDescription = function(example) {
-            
+
             // get before and after rollups
             var befores = example.befores();
             var afters = example.afters();
 
-            // create a module with setup and teardown 
+            // create a module with setup and teardown
             // that executes all current befores/afters
             statements.push(function(){
                 module(example.names(), {
@@ -582,13 +582,13 @@
                     test(spec[0],spec[1]);
                 });
             });
-            
+
             // recurse through example's nested examples
             each(example.children, function() {
-                compileDescription(this);            
+                compileDescription(this);
             });
         };
-        
+
 
         // compile all root examples
         each(examples, function() {
@@ -597,9 +597,9 @@
 
         return statements;
     };
-    
 
-    
+
+
     // =====================
     // = Expose Public API =
     // =====================

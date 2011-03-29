@@ -6,7 +6,7 @@ require 'zip/zip'
 require 'find'
 require 'fileutils'
 include FileUtils
-  
+
 task :default => :test
 
 # list of browsers to auto-bind to JsTestDrive Server
@@ -31,7 +31,7 @@ task :build => [:clean] do
 
   # copy src
   cp 'pavlov.js', 'dist/pavlov.js'
-  
+
   # copy documentation
   cp 'README.markdown', 'dist/README.markdown'
 
@@ -40,12 +40,12 @@ task :build => [:clean] do
   cp 'lib/qunit.css', 'dist/lib/qunit.css'
   cp 'spec/lib/jquery/GPL-LICENSE.txt', 'dist/lib/GPL-LICENSE.txt'
   cp 'spec/lib/jquery/MIT-LICENSE.txt', 'dist/lib/MIT-LICENSE.txt'
-  
+
   # copy example
   cp 'example/example.specs.html', 'dist/example/example.specs.html'
   cp 'example/example.specs.js', 'dist/example/example.specs.js'
 
-  
+
   # minify src
   source = File.read('dist/pavlov.js')
   minified = Packr.pack(source, :shrink_vars => true, :base62 => false)
@@ -54,7 +54,7 @@ task :build => [:clean] do
   # inject header
   File.open('dist/pavlov.min.js', 'w') do |combined|
     combined.puts(header)
-    combined.write(minified)  
+    combined.write(minified)
   end
 end
 
@@ -68,14 +68,14 @@ task :release => [:build] do
       Find.prune if File.basename(path)[0] == ?.
       dest = /dist\/(\w.*)/.match(path)
       zip.add(dest[1],path) if dest
-    end 
-  end    
+    end
+  end
 end
 
 
 
 desc "Run the tests in default browser"
-task :test => [:build] do  
+task :test => [:build] do
   begin
     # mac
     sh("open spec/pavlov.specs.html")
@@ -117,4 +117,4 @@ end
 # clean deletes built copies
 CLEAN.include('dist/')
 # clobber cleans and uninstalls JsTestDriver server
-CLOBBER.include('spec/lib/js-test-driver/*.jar')  
+CLOBBER.include('spec/lib/js-test-driver/*.jar')
