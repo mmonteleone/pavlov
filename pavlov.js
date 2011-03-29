@@ -230,11 +230,10 @@
                 actual();
                 ok(!true, message);
             } catch(e) {
-                if(arguments.length > 1) {
-                    ok(e === expectedErrorDescription, message);                        
-                } else {
-                    ok(true, message);                        
-                }
+                // so, this bit of weirdness is basically a way to allow for the fact
+                // that the test may have specified a particular type of error to catch, or not.
+                // and if not, e would always === e.  
+                ok(e === (expectedErrorDescription || e), message);                
             }                               
         }
     };
@@ -250,6 +249,41 @@
     var assertHandler = function(value) {
         this.value = value;
     };
+    
+    /**
+     * Naive display formatter for objects which wraps the objects'
+     * own toString() value with type-specific delimiters.
+     * [] for array
+     * "" for string
+     * Does not currently go nearly detailed enough for JSON use, 
+     * just enough to show small values within test results
+     * @param {Object} obj object to format
+     * @returns naive display-formatted string representation of the object
+     */
+    var format = function(obj) {
+        if(typeof obj === 'undefined') {
+            return "";
+        } else if(Object.prototype.toString.call(obj) === "[object Array]") {
+            return '[' + obj.toString() + ']';
+        } else if(Object.prototype.toString.call(obj) === "[object Function]") {
+            return "function()";
+        } else if(typeof obj == "string") {
+            return '"' + obj + '"';
+        } else {
+            return obj;
+        }
+    };
+    
+    /**
+     * transforms a camel or pascal case string 
+     * to all lower-case space-separated phrase
+     * @param {string} value pascal or camel-cased string
+     * @returns all-lower-case space-separated phrase
+     */
+    var letterCase = function(value) {
+        return value.replace(/([A-Z])/g,' $1').toLowerCase();
+    };    
+        
     /**
      * Appends assertion methods to the assertHandler prototype
      * For each provided assertion implementation, adds an identically named
@@ -263,7 +297,17 @@
                 // by pre-pending assertHandler's current value to args
                 var args =  makeArray(arguments);
                 args.unshift(this.value);           
-                fn.apply(this, args);
+
+                // if no explicit message was given with the assertion, 
+                // then let's build our own friendly one 
+                if(fn.length === 2) {
+                    args[1] = args[1] || 'asserting ' + format(args[0]) + ' ' + letterCase(name);
+                } else if(fn.length === 3) {
+                    var expected = format(args[1]);
+                    args[2] = args[2] || 'asserting ' + format(args[0]) + ' ' + letterCase(name) + (expected ? ' ' + expected : expected);
+                }
+
+                fn.apply(this, args);                
             };
         }); 
     };

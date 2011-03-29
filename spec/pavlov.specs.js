@@ -620,7 +620,7 @@ QUnit.specify("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([true,undefined]);
+                assert(passedArgs).isSameAs([true,'asserting function() throws exception']);
             });
             
             it("should pass false to qunit's ok() when function does not throw exception", function(){
@@ -634,7 +634,7 @@ QUnit.specify("Pavlov", function() {
                 });
                 
                 // verify correct arguments would have been passed to qunit
-                assert(passedArgs).isSameAs([false,undefined]);                
+                assert(passedArgs).isSameAs([false,'asserting function() throws exception']);                
             });
             
             it("should pass true to qunit's ok() when function throws exception with expected description", function(){
@@ -700,6 +700,82 @@ QUnit.specify("Pavlov", function() {
                 assert(yellowArgs).isSameAs([2,"some message"]);
             });
 
+        });
+        
+        describe("that have provided messages", function(){
+            it("should display those messages", function(){
+                var gtArgs, ltArgs;
+                QUnit.specify.extendAssertions({
+                    isGreaterThan: function(actual, expected, message) {
+                        gtArgs = $.makeArray(arguments);
+                    }
+                });
+                assert(4).isGreaterThan(2,"some message");
+                assert(gtArgs).isSameAs([4,2,"some message"]);
+            });
+        });
+        
+        describe("that do not have provided messages", function(){
+            it("should generate messages using letter-cased assertion name and serialized expected/actuals", function(){
+                var gtArgs, ltArgs;
+                QUnit.specify.extendAssertions({
+                    isGreaterThan: function(actual, expected, message) {
+                        gtArgs = $.makeArray(arguments);
+                    }
+                });
+                assert(4).isGreaterThan(2);
+                assert(gtArgs).isSameAs([4,2,"asserting 4 is greater than 2"]);
+            });
+            describe("when the values are arrays", function(){
+                it("should properly serialize", function(){
+                    var gtArgs, ltArgs;
+                    QUnit.specify.extendAssertions({
+                        hasLengthOf: function(actual, expected, message) {
+                            gtArgs = $.makeArray(arguments);
+                        }
+                    });
+                    assert(['a','b','c']).hasLengthOf(3);
+                    assert(gtArgs).isSameAs([['a','b','c'],3,"asserting [a,b,c] has length of 3"]);                                    
+                });
+            });
+            describe("when the values are functions", function(){
+                it("should properly serialize", function(){
+                    var gtArgs, ltArgs;
+                    QUnit.specify.extendAssertions({
+                        isAFunction: function(actual, message) {
+                            gtArgs = $.makeArray(arguments);
+                        }
+                    });
+                    var helloFn = function() { alert('hello'); };
+                    assert(helloFn).isAFunction();
+                    assert(gtArgs).isSameAs([helloFn,"asserting function() is a function"]);                                    
+                });
+            }); 
+            describe("when the values are strings", function(){
+                it("should properly serialize", function(){
+                    var gtArgs, ltArgs;
+                    QUnit.specify.extendAssertions({
+                        isAStringWithLengthOf: function(actual, expected, message) {
+                            gtArgs = $.makeArray(arguments);
+                        }
+                    });
+                    assert("test string").isAStringWithLengthOf(11);
+                    assert(gtArgs).isSameAs(["test string",11,"asserting \"test string\" is a string with length of 11"]);                                    
+                });
+            });
+            describe("when the values are primitives", function(){
+                given([4,5],[false,true],[3.14,2.718])
+                    .it("should properly serialize", function(a,b){
+                        var gtArgs, ltArgs;
+                        QUnit.specify.extendAssertions({
+                            isNotTheSameLiteralValueAs: function(actual, expected, message) {
+                                gtArgs = $.makeArray(arguments);
+                            }
+                        });
+                        assert(a).isNotTheSameLiteralValueAs(b);
+                        assert(gtArgs).isSameAs([a,b,("asserting " + a.toString() + " is not the same literal value as " + b.toString())]);                                                        
+                    });                
+            });
         });
     });
 });

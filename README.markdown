@@ -13,7 +13,7 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
 * Nested examples (describes)
 * Cascading befores and afters (setups and teardowns)
 * Generative row tests
-* Fluent, extendable, assertions
+* Fluent, extendable, assertions with intelligent messages
 * Spec stubbing
 * Simplified async support
 * Non-DOM-polluting
@@ -268,8 +268,9 @@ Creates a spec (test) to occur within an example (decribe)
 When not passed fn, creates a spec-stubbing fn which asserts fail "Not Implemented"
 
 *Parameters*
-* specification (String) - Description of what "it" "should do"
-* fn (Function) - Optional function containing a test to assert that it does indeed do it (optional)
+
+ * specification (String) - Description of what "it" "should do"
+ * fn (Function) - Optional function containing a test to assert that it does indeed do it (optional)
 
 *Example*
 
@@ -329,7 +330,7 @@ A few Examples:
 
 #### Built-in Assertions
 
-Most are self-explanatory.  Message parameter is always optional.
+Most are self-explanatory.  Message parameter is always optional.  When a message is not provided, one is automatically generated based on combining the letter-cased assertion method name with serialized versions of the expected and actual parameters.  So, `assert(5).isNotEqualTo(4)` generates a default message of `asserting 5 is not equal to 4`.
 
 * assert(actual).equals(expected, message);
 * assert(actual).isEqualTo(expected, message);
