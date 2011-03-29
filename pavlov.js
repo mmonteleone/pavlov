@@ -400,6 +400,9 @@
                 throw("at least one argument is required");
             }
             var args = makeArray(arguments);
+            if(arguments.length === 1 && isArray(arguments[0])) {
+                args = args[0];
+            }
 
             return {
                 /**

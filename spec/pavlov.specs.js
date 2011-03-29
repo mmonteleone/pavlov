@@ -216,6 +216,16 @@ QUnit.specify("Pavlov", function() {
                     assert(z).equals(multiArgGivenCount * 3 + 3);
                     multiArgGivenCount++;
             });
+
+            var arrayPassedMultiArgGivenCount = 0;
+
+            given([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).
+                it("should test for each of given()'s args when passed array of array arguments", function(x, y, z) {
+                    assert(x).equals(arrayPassedMultiArgGivenCount * 3 + 1, "some message");
+                    assert(y).equals(arrayPassedMultiArgGivenCount * 3 + 2);
+                    assert(z).equals(arrayPassedMultiArgGivenCount * 3 + 3);
+                    arrayPassedMultiArgGivenCount++;
+            });
         });
 
         describe("with a wait()", function() {
