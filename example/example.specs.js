@@ -14,7 +14,9 @@ QUnit.specify("Pavlov Example", function(){
         
         it("can be specified like so", function(){
             assert(foo).equals('bar');            
-        });
+        });	
+
+		it("fails if a test function is not defined for a feature");
         
         given([2,2,4], [5,2,7], [6,-4,2]).
             it("can generate row data tests", function(a, b, c) {
@@ -36,8 +38,6 @@ QUnit.specify("Pavlov Example", function(){
             it("with their own specs", function(){
                 assert(foo).equals("barbar");                
             });
-
-			it("fails if a test is not defined");
 
 	        given([2,2,4], [5,2,7], [6,-4,2]).
 	            it("can generate nested row data tests", function(a, b, c) {

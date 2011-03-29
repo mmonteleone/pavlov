@@ -12,6 +12,7 @@ test("standard QUnit Test should still run alongside QUnit.specify", function() 
 QUnit.specify("Pavlov", function() {
     
     describe("a QUnit.specify()", function() {
+	
         it("should throw exception if name or fn params not passed", function(){
             assert(function(){
                 QUnit.specify(function(){});
