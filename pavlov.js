@@ -357,7 +357,7 @@
                 throw("at least one argument is required");
             }
             var args = makeArray(arguments);
-            var thisIt = this.it;
+			var thisApi = this;
 
             return {
                 /**
@@ -367,7 +367,7 @@
                 it: function(specification, fn) {
                     each(args, function(){                        
                         var arg = this;   
-                        thisIt("given " + arg + ", " + specification, function(){ 
+                        thisApi.it("given " + arg + ", " + specification, function(){ 
                             fn.apply(this, isArray(arg) ? arg : [arg]);
                         });
                     });
