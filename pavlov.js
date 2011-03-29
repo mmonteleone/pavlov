@@ -336,12 +336,11 @@
             if(arguments.length === 0) {
                 throw("'specification' argument is required");
             }
-            thisApi = this;
             if(fn) {
                 currentExample.specs.push([specification, fn]);
             } else {
                 // if not passed an implementation, create an implementation that simply asserts fail
-                thisApi.it(specification, function(){thisApi.assert.fail('Not Implemented');});
+                api.it(specification, function(){api.assert.fail('Not Implemented');});
             }
         },
 
@@ -357,7 +356,6 @@
                 throw("at least one argument is required");
             }
             var args = makeArray(arguments);
-            var thisApi = this;
 
             return {
                 /**
@@ -367,7 +365,7 @@
                 it: function(specification, fn) {
                     each(args, function(){                        
                         var arg = this;   
-                        thisApi.it("given " + arg + ", " + specification, function(){ 
+                        api.it("given " + arg + ", " + specification, function(){ 
                             fn.apply(this, isArray(arg) ? arg : [arg]);
                         });
                     });

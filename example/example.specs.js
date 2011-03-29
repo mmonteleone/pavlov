@@ -14,7 +14,9 @@ QUnit.specify("Pavlov Example", function(){
         
         it("can be specified like so", function(){
             assert(foo).equals('bar');            
-        });
+        });	
+
+		it("fails with 'Not Implemented' if a specification does not have an associated test");
         
         given([2,2,4], [5,2,7], [6,-4,2]).
             it("can generate row data tests", function(a, b, c) {
@@ -36,6 +38,11 @@ QUnit.specify("Pavlov Example", function(){
             it("with their own specs", function(){
                 assert(foo).equals("barbar");                
             });
+
+	        given([2,2,4], [5,2,7], [6,-4,2]).
+	            it("can generate nested row data tests", function(a, b, c) {
+	                assert(c).equals(a + b);
+	            });
             
         });
                 
