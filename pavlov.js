@@ -357,7 +357,7 @@
                 throw("at least one argument is required");
             }
             var args = makeArray(arguments);
-			var thisApi = this;
+            var thisApi = this;
 
             return {
                 /**
