@@ -1,6 +1,6 @@
 Pavlov
 ======
-Behavioral API over [QUnit][1]  
+Behavioral API over [QUnit][1]
 [http://github.com/mmonteleone/pavlov][11]
 
 What's all this then?
@@ -24,36 +24,36 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
 
     describe("Bowling", function(){
         // variables scoped only to this and nested examples
-        var bowling;        
-        
+        var bowling;
+
         // befores and afters:
-  
+
         before(function(){
             // this setup occurs before all specs both
             // in this example, and any nested examples
-            bowling = new Bowling();        
+            bowling = new Bowling();
         });
-                
+
         // specs:
-      
+
         it("should score 0 for gutter game", function(){
             for(var i=0;i<20;i++) {
                 bowling.hit(0);
             }
-        
+
             assert(bowling.score).equals(0);
         });
-                          
+
         // stubs specs which yield "Not Implemented" failures:
-        
+
         it("should allow 2 rolls on frame 1-9");
-        it("should allow 3 rolls on the last frame");      
-            
+        it("should allow 3 rolls on the last frame");
+
         // generative row tests:
-        
+
         given([5, 4], [8, 2], [9, 1]).
             it("should award a spare if all knocked down on 2nd roll", function(roll1, roll2) {
-                // this spec is called 3 times, with each of the 3 sets of given()'s 
+                // this spec is called 3 times, with each of the 3 sets of given()'s
                 // parameters applied to it as arguments
 
                 if(roll1 + roll2 == 10) {
@@ -62,37 +62,37 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
 
                 assert(bowling.displayMessage).equals('Spare!');
             });
-      
+
         // nested examples (n-level depth):
 
         describe("Duck Pin Variation", function(){
-        
+
             before(function(){
                 // setup method which occurs before all of this example's
                 // specs, but after the parent example's before()
                 bowling.mode = BowlingMode.DuckPin;
             })
-        
+
             it("should allow 3 balls per frame");
             it("should award no bonus if knocked down in 3rd frame");
-                
+
         });
-        
+
         // fluent assertions
-        
+
         it("should only allow 10 frames", function(){
             // add 10 frames
             for(var i=0;i<10;i++) {
                 bowling.moveNextFrame();
-            } 
-        
-            // try to add an 11th  
-            // expect an exception      
+            }
+
+            // try to add an 11th
+            // expect an exception
             assert(function(){
                 bowling.moveNextFrame();
             }).throwsException();
         });
-              
+
     });
 
 **...Pavlov compiles the examples down into flattened vanilla QUnit `module` and `test` statements which are then executed**
@@ -109,7 +109,7 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
 
 Notice how the nested example became a composite module, and how the given() call generated three tests, one for each argument.
 
-      
+
 Reasonable Questions Reasonable People Should Ask
 -------------------------------------------------
 
@@ -119,9 +119,9 @@ No, not really.  Pavlov is just a library providing a higher-level way of intera
 
 **So it's just an aliased syntax for the QUnit?**
 
-No.  Pavlov provides a different mode of testing with higher level constructs for operating in that mode.  Just like other Behavior Driven Development (BDD) testing frameworks, this shifts the focus of unit testing from QA to Design.  Here is the point in the worn-out debate where many reasonable arguments can be made about how that's what TDD was always about in the first place.  I'd probably agree.  
+No.  Pavlov provides a different mode of testing with higher level constructs for operating in that mode.  Just like other Behavior Driven Development (BDD) testing frameworks, this shifts the focus of unit testing from QA to Design.  Here is the point in the worn-out debate where many reasonable arguments can be made about how that's what TDD was always about in the first place.  I'd probably agree.
 
-At any rate, being able to define nested, private, example scopes with cascading befores/afters and data-generated row tests can be really useful, strict BDD or otherwise.  It's a natural, hierarchical, way of composing and testing functionality.  
+At any rate, being able to define nested, private, example scopes with cascading befores/afters and data-generated row tests can be really useful, strict BDD or otherwise.  It's a natural, hierarchical, way of composing and testing functionality.
 
 **So why would I want this?**
 
@@ -133,7 +133,7 @@ You might already have a large investment in some other test framework, and simp
 
 **Looks like [Screw.Unit][6].  Why not just use Screw.Unit or fork it?**
 
-Yeah, it looks *really* similar.  And Screw.Unit might well be perfect for you and your project.  However, Pavlov is a response to a need for certain features not provided by other BDD frameworks, including among others, compatibility with QUnit.  
+Yeah, it looks *really* similar.  And Screw.Unit might well be perfect for you and your project.  However, Pavlov is a response to a need for certain features not provided by other BDD frameworks, including among others, compatibility with QUnit.
 
 By simply layering on top of QUnit, Pavlov gains all of QUnit's simplicity, stability, and maturity/integration with tools, while also being able to quickly build up a BDD API.
 
@@ -151,7 +151,7 @@ Documentation:
 
 If you're just using Pavlov and not developing it or running its unit tests, just download the [latest packaged release from Github][10].
 
-Contained in the package is a barebones **example spec setup**, which is just a standard QUnit test host document including the the normal QUnit dependencies, but also pavlov.js and a spec suite script.  
+Contained in the package is a barebones **example spec setup**, which is just a standard QUnit test host document including the the normal QUnit dependencies, but also pavlov.js and a spec suite script.
 
 ### Running tests
 
@@ -162,7 +162,7 @@ Tests can be run by simply opening the test host document in a browser or by tak
 
 #### QUnit.specify()
 
-Function which declares a new QUnit.specify context.  It's the required top-level method which provides an overall scope for creation, compilation, and running of Pavlov specs.  
+Function which declares a new QUnit.specify context.  It's the required top-level method which provides an overall scope for creation, compilation, and running of Pavlov specs.
 
 *Parameters*
 
@@ -173,8 +173,8 @@ Function which declares a new QUnit.specify context.  It's the required top-leve
 
     QUnit.specify("The Rules of Bowling", function(){
         // descriptions contained within specification context
-        describe(....  
-        describe(....  
+        describe(....
+        describe(....
     });
 
 #### describe()
@@ -194,7 +194,7 @@ Initiates a new Example.  A description translates to a QUnit module.
         it(...
         it(...
     });
-    
+
 #### before()
 
 Sets a function to occur before all contained specs and nested examples' specs.  The function(s) is/are executed within a QUnit module's setup option.
@@ -209,7 +209,7 @@ Sets a function to occur before all contained specs and nested examples' specs. 
         var bowling;
 
         before(function(){
-            bowling = new Bowling();        
+            bowling = new Bowling();
         });
     ...
 
@@ -227,17 +227,17 @@ Sets a function to occur after all contained specs and nested examples' specs.  
         var bowling;
 
         before(function(){
-            bowling = new Bowling();        
+            bowling = new Bowling();
         });
     ...
 
 #### Nested Examples
 
-Examples can be nested as deep as necessary.  
+Examples can be nested as deep as necessary.
 
 * A nested example has access to the parent's scope.
 * A a parent example's before and after methods still occur before and after all nested example's specs, in the following pattern:
-  *  Nested befores are executed before specs in order from outermost-to-innermost 
+  *  Nested befores are executed before specs in order from outermost-to-innermost
   *  Nested afters are executed after specs in order from innermost-to-outermost
 
 *Example*
@@ -249,16 +249,16 @@ Examples can be nested as deep as necessary.
         after(...
         it(...
         it(...
-          
+
         // nested example
         describe("Duck Pin Variation", function(){
             before(...
             after(...
             it(...
-            it(...            
-        });    
+            it(...
+        });
     });
-  
+
 ### Defining Specs
 
 
@@ -274,9 +274,9 @@ When not passed fn, creates a spec-stubbing fn which asserts fail "Not Implement
 
 *Example*
 
-    //.. within a describe 
+    //.. within a describe
     it("should score 0 for gutter game", function(){
-        // code and assertion to test the specification    
+        // code and assertion to test the specification
         for(var i=0;i<20;i++) {
             bowling.hit(0);
         }
@@ -286,10 +286,10 @@ When not passed fn, creates a spec-stubbing fn which asserts fail "Not Implement
     // stubs specs which yield "Not Implemented" failures:
     it("should allow 2 rolls on frame 1-9");
     it("should allow 3 rolls on the last frame");
-    
+
 #### given()
 
-Generates a row spec for each argument passed, applying each argument to a new call against the spec.  
+Generates a row spec for each argument passed, applying each argument to a new call against the spec.
 Returns an object with an it() function for declaring a spec to be called for each of the given's arguments.
 
 *Parameters*
@@ -302,11 +302,11 @@ Returns an object with an it() function for declaring a spec to be called for ea
         it("can generate row data tests", function(a, b, c) {
             assert(c).equals(a + b);
         });
-    
+
     given(1, 3, 4).
         it("doesn't require arrays", function(x) {
             assert(x > 0).isTrue();
-        });    
+        });
 
 ### Using Assertions
 
@@ -315,7 +315,7 @@ Pavlov's assertions are fluent extensions to QUnit's assertion primitives.  Pavl
 Syntax usually follows the pattern:
 
     assert(actual).comparisonMethod(expected, optionalMessage);
-    
+
 A few Examples:
 
     assert(foo).equals("bar");
@@ -336,11 +336,11 @@ Most are self-explanatory.  Message parameter is always optional.  When a messag
 * assert(actual).isEqualTo(expected, message);
 * assert(actual).isNotEqualTo(expected, message);
 * assert(actual).isSameAs(expected, message);   // deep value comparison using QUnit's equiv()
-* assert(actual).isNotSameAs: function(actual, expected, message);            
-* assert(actual).isTrue(message);     
-* assert(actual).isFalse(message);            
+* assert(actual).isNotSameAs: function(actual, expected, message);
+* assert(actual).isTrue(message);
+* assert(actual).isFalse(message);
 * assert(actual).isNull(message);
-* assert(actual).isNotNull(message);            
+* assert(actual).isNotNull(message);
 * assert(actual).isDefined(message);
 * assert(actual).isUndefined(message);
 * assert.pass(message);  // shortcut for assert().pass(message);
@@ -356,14 +356,14 @@ For more readable tests, domain-specific assertions can be added.
 
 *Parameters*
 
-* asserts (Object) - object containing implementations for assertions.  Each gets wrapped into an extension available when calling assert().  
+* asserts (Object) - object containing implementations for assertions.  Each gets wrapped into an extension available when calling assert().
 
 *Example*
 
     // first provide assertion implementations
     // each accepts an actual, optional expected, and message
     // the implementation names become the names of the assertions
-    
+
     QUnit.specify.extendAssertions({
         isGreaterThan: function(actual, expected, message) {
             ok(actual > expected, message);
@@ -376,9 +376,9 @@ For more readable tests, domain-specific assertions can be added.
             ok(actual.length == 2);
         }
     });
-    
+
     // then make use of the generated assertions
-    
+
     assert(4).isGreaterThan(2);
     assert(5).isLessThan(10, "some message");
     assert(["a", b]).containsExactlyTwoElements();
@@ -401,15 +401,15 @@ One of QUnit's strengths is its support for testing asynchronous code.  To sligh
     describe("a wait()", function(){
         it("should pause the test runner", function(){
             var timeoutCompleted = false;
-              
+
             setTimeout(function(){
-                timeoutCompleted = true;    
+                timeoutCompleted = true;
             }, 40);
 
             // wait long enough for timeout to have completed
             wait(50, function(){
                 assert(timeoutCompleted).isTrue();
-            });      
+            });
         });
     });
 
@@ -423,13 +423,13 @@ Just set `QUnit.specify.globalApi = true;` before a `QUnit.specify()` block.  It
 
 * QUnit.specify.globalApi
   * false (default): does not globally inject API, uses metaprogramming
-  * true: globally injects API, no metaprogramming 
+  * true: globally injects API, no metaprogramming
 
 *Example*
 
     QUnit.specify.globalApi = true;  // injects API into global scope
-    // before a standard specify 
-    QUnit.specify(... 
+    // before a standard specify
+    QUnit.specify(...
 
 Contributing
 ------------
@@ -451,16 +451,16 @@ The following build tasks are available:
 Credit
 ------
 
-Credit of course goes to:  
+Credit of course goes to:
 
-[QUnit][1]: Copyright (c) 2008 John Resig, Jörn Zaefferer, used under the terms of the MIT LICENSE  
-[RSpec][9]: David Chelimsky and RSpec Development Team  
+[QUnit][1]: Copyright (c) 2008 John Resig, Jörn Zaefferer, used under the terms of the MIT LICENSE
+[RSpec][9]: David Chelimsky and RSpec Development Team
 [Screw.Unit][6]: Copyright (c) 2008 Nick Kallen and especially Yehuda Katz metaprogramming contributions to it
 
 Changelog
 ---------
 
-* 0.2.3 
+* 0.2.3
     - removed GPL license.  Now just MIT.  So long, jQuery dual license weirdness.
     - cleaned up and hopefully simplified project tree
 * 0.2.2
@@ -472,7 +472,7 @@ Changelog
 * 0.2.1 - Updated to latest version of qunit.js/css, Fixed an IE regression in 0.2
 * 0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
 * 0.1 - Initial Release
-  
+
 License
 -------
 

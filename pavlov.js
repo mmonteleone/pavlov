@@ -28,17 +28,21 @@
         var name;
         var i = 0;
         var length = object.length;
+        var value;
 
-        if ( length === undefined ) {
-            for ( name in object ) {
-                if ( callback.call( object[ name ], name, object[ name ] ) === false ) {
-                    break;
+        if (length === undefined) {
+            for (name in object) {
+                if(object.hasOwnProperty(name)) {
+                    if (callback.call( object[name], name, object[name]) === false) {
+                        break;
+                    }
                 }
             }
         } else {
-            for ( var value = object[0];
-                i < length && callback.call( value, i, value ) !== false;
-                value = object[++i] ) {}
+            for (value = object[0];
+                i < length && callback.call(value, i, value) !== false;
+                value = object[++i]) {
+            }
         }
 
         return object;
@@ -73,8 +77,11 @@
      * @param {Object} src object containing properies to merge
      */
     var extend = function(dest, src) {
-        for(var prop in src) {
-            dest[prop] = src[prop];
+        var prop;
+        for(prop in src) {
+            if(src.hasOwnProperty(prop)) {
+                dest[prop] = src[prop];
+            }
         }
     };
 
@@ -222,13 +229,13 @@
             ok(true, message);
         },
         fail: function(actual, message) {
-            ok(!true, message);
+            ok(false, message);
         },
         throwsException: function(actual, expectedErrorDescription, message) {
             /* can optionally accept expected error message */
             try{
                 actual();
-                ok(!true, message);
+                ok(false, message);
             } catch(e) {
                 // so, this bit of weirdness is basically a way to allow for the fact
                 // that the test may have specified a particular type of error to catch, or not.
@@ -267,7 +274,7 @@
             return '[' + obj.toString() + ']';
         } else if(Object.prototype.toString.call(obj) === "[object Function]") {
             return "function()";
-        } else if(typeof obj == "string") {
+        } else if(typeof obj === "string") {
             return '"' + obj + '"';
         } else {
             return obj;
@@ -332,7 +339,7 @@
          */
         describe: function(description, fn) {
             if(arguments.length < 2) {
-                throw("both 'description' and 'fn' arguments are required");
+                throw "both 'description' and 'fn' arguments are required";
             }
 
             // capture reference to current example before construction
@@ -354,7 +361,7 @@
          */
         before: function(fn) {
             if(arguments.length === 0) {
-                throw("'fn' argument is required");
+                throw "'fn' argument is required";
             }
             currentExample.before = fn;
         },
@@ -365,7 +372,7 @@
          */
         after: function(fn) {
             if(arguments.length === 0) {
-                throw("'fn' argument is required");
+                throw "'fn' argument is required";
             }
             currentExample.after = fn;
         },
@@ -378,7 +385,7 @@
          */
         it: function(specification, fn) {
             if(arguments.length === 0) {
-                throw("'specification' argument is required");
+                throw "'specification' argument is required";
             }
             if(fn) {
                 currentExample.specs.push([specification, fn]);
@@ -397,7 +404,7 @@
          */
         given: function() {
             if(arguments.length === 0) {
-                throw("at least one argument is required");
+                throw "at least one argument is required";
             }
             var args = makeArray(arguments);
             if(arguments.length === 1 && isArray(arguments[0])) {
@@ -437,7 +444,7 @@
          */
         wait: function(ms, fn) {
             if(arguments.length < 2) {
-                throw("both 'ms' and 'fn' arguments are required");
+                throw "both 'ms' and 'fn' arguments are required";
             }
             stop();
             QUnit.specify.globalObject.setTimeout(function(){
@@ -507,7 +514,7 @@
      */
     var specify = function(name, fn) {
         if(arguments.length < 2) {
-            throw("both 'name' and 'fn' arguments are required")
+            throw "both 'name' and 'fn' arguments are required";
         }
         examples = [];
         currentExample = null;
@@ -517,8 +524,9 @@
         addEvent(window,'load',function(){
             // document.getElementsByTag('h1').innerHTML = name;
             var h1s = document.getElementsByTagName('h1');
-            if(h1s.length > 0)
+            if(h1s.length > 0) {
                 h1s[0].innerHTML = document.title;
+            }
         });
 
         if(QUnit.specify.globalApi) {
@@ -617,5 +625,5 @@
         globalObject: window              // injectable global containing setTimeout and pals
     });
 
-})();
+}());
 
