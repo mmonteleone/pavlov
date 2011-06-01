@@ -38,8 +38,6 @@ task :build => [:clean] do
   # copy lib
   cp 'lib/qunit.js', 'dist/lib/qunit.js'
   cp 'lib/qunit.css', 'dist/lib/qunit.css'
-  cp 'spec/lib/jquery/GPL-LICENSE.txt', 'dist/lib/GPL-LICENSE.txt'
-  cp 'spec/lib/jquery/MIT-LICENSE.txt', 'dist/lib/MIT-LICENSE.txt'
 
   # copy example
   cp 'example/example.specs.html', 'dist/example/example.specs.html'
