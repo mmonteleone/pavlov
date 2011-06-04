@@ -29,6 +29,14 @@ pavlov.specify("Pavlov Example", function(){
             }).throwsException();
         });
 
+        it("can specify asynchronous features", async(function(){
+            // an async spec implementation will pause the test runner until 'resume()'
+            setTimeout(function(){
+                assert.pass();
+                resume();
+            }, 500);
+        }));
+
         describe("can also have nested examples", function(){
 
             before(function(){

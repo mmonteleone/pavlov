@@ -1,5 +1,5 @@
 /**
- * Pavlov - Framework-independent Behavioral JavaScript Testing API
+ * Pavlov - Test framework-independent behavioral API
  *
  * version 0.3.0pre
  *
@@ -53,10 +53,7 @@
          * @returns array
          */
         makeArray: function(array) {
-            var ret = [];
-            var i = array.length;
-            while(i) { ret[--i] = array[i]; }
-            return ret;
+            return Array.prototype.slice.call(array);
         },
         /**
          * returns whether or not an object is an array
@@ -358,11 +355,28 @@
                 throw "'specification' argument is required";
             }
             if(fn) {
+                if(fn.async) {
+                    specification += " asynchronously";
+                }
                 currentExample.specs.push([specification, fn]);
             } else {
                 // if not passed an implementation, create an implementation that simply asserts fail
                 api.it(specification, function(){api.assert.fail('Not Implemented');});
             }
+        },
+
+        /**
+         * wraps a spec (test) implementation with an initial call to pause() the test runner
+         * The spec must call resume() when ready
+         * @param {Function} fn Function containing a test to assert that it does indeed do it (optional)
+         */
+        async: function(fn) {
+            var implementation = function(){
+                adapter.pause();
+                fn();
+            };
+            implementation.async = true;
+            return implementation;
         },
 
         /**
@@ -421,6 +435,20 @@
                 fn();
                 adapter.resume();
             }, ms);
+        },
+
+        /**
+         * specifies test framework to pause test runner
+         */
+        pause: function() {
+            adapter.pause();
+        },
+
+        /**
+         * specifies test framework to resume test runner
+         */
+        resume: function() {
+            adapter.resume();
         }
     };
 
@@ -571,8 +599,7 @@
         },
         util: {
             each: util.each,
-            extend: util.extend,
-            makeArray: util.makeArray
+            extend: util.extend
         },
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions   // function for adding custom assertions

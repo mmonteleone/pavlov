@@ -6,7 +6,6 @@ test("should be able to run before Pavlov's QUnit Adapter", function() {
     ok(firstStandardQUnitTestRan);
 });
 
-
 // intercept calls to adapter methods for testing they were run
 var capturedSuiteName;
 var adapterMethods = {
@@ -73,15 +72,18 @@ pavlov.specify("Pavlov", function() {
         try {
             originalMethod = object[methodName];
             object[methodName] = function(){
-                args = pavlov.util.makeArray(arguments);
+                args = makeArray(arguments);
             };
             if(callback.apply(this, args) === true) {
-                originalMethod.apply(this, args);
+                originalMethod.apply(object, args);
             }
         } finally {
             object[methodName] = originalMethod;
         }
         return args;
+    };
+    var makeArray = function(args) {
+        return Array.prototype.slice.call(args);
     };
 
     describe("version", function(){
@@ -169,15 +171,6 @@ pavlov.specify("Pavlov", function() {
                 assert(target.a).equals(1);
                 assert(target.c).equals(5);
                 assert(target.d).equals(6);
-            });
-        });
-        describe("makeArray()", function(){
-            it("should convert array-like items to arrays", function(){
-                var result;
-                (function(){
-                    result = pavlov.util.makeArray(arguments);
-                }(1,2,3,4));
-                assert(result).contentsEqual([1,2,3,4]);
             });
         });
     });
@@ -329,7 +322,7 @@ pavlov.specify("Pavlov", function() {
                     // later, will verify the correct behavior happened with 1 arg.
                     it = function() {
                         if(arguments.length === 2) {
-                            args = pavlov.util.makeArray(arguments);
+                            args = makeArray(arguments);
                         } else {
                             originalIt.apply(this,arguments);
                         }
@@ -451,9 +444,44 @@ pavlov.specify("Pavlov", function() {
             });
 
         });
+
+        describe("with a pause()", function(){
+            it("should proxy adapter's pause()", function(){
+                var originalPause = pavlov.adapter.pause;
+                var paused = false;
+                pavlov.adapter.pause = function() { paused = true; }
+                pause();
+                pavlov.adapter.pause = originalPause;
+                assert(paused).isTrue();
+            });
+        });
+
+        describe("with a resume()", function(){
+            it("should proxy adapter's resume()", function(){
+                var originalResume = pavlov.adapter.resume;
+                var resumed = false;
+                pavlov.adapter.resume = function() { resumed = true; }
+                resume();
+                pavlov.adapter.resume = originalResume;
+                assert(resumed).isTrue();
+            });
+        });
+
+        describe("with an async()", function(){
+            it("should return a function which calls pause and then the original function", function(){
+                var calls = [];
+                var specImplementation = function() { calls.push('spec'); };
+                var originalPause = pavlov.adapter.pause;
+                pavlov.adapter.pause = function(){ calls.push('pause'); };
+
+                var asyncSpecImplementation = async(specImplementation);
+                asyncSpecImplementation();
+
+                pavlov.adapter.pause = originalPause;
+                assert(calls).contentsEqual(['pause','spec']);
+            });
+        });
     });
-
-
 
     describe("assertions", function() {
 
@@ -825,10 +853,10 @@ pavlov.specify("Pavlov", function() {
                 var gtArgs, ltArgs;
                 pavlov.extendAssertions({
                     isGreaterThan: function(actual, expected, message) {
-                        gtArgs = pavlov.util.makeArray(arguments);
+                        gtArgs = makeArray(arguments);
                     },
                     isLessThan: function(actual, expected, message) {
-                        ltArgs = pavlov.util.makeArray(arguments);
+                        ltArgs = makeArray(arguments);
                     }
                 });
 
@@ -843,10 +871,10 @@ pavlov.specify("Pavlov", function() {
                 var purpleArgs, yellowArgs;
                 pavlov.extendAssertions({
                     isPurple: function(actual, message) {
-                        purpleArgs = pavlov.util.makeArray(arguments);
+                        purpleArgs = makeArray(arguments);
                     },
                     isYellow: function(actual, message) {
-                        yellowArgs = pavlov.util.makeArray(arguments);
+                        yellowArgs = makeArray(arguments);
                     }
                 });
 
@@ -864,7 +892,7 @@ pavlov.specify("Pavlov", function() {
                 var gtArgs, ltArgs;
                 pavlov.extendAssertions({
                     isGreaterThan: function(actual, expected, message) {
-                        gtArgs = pavlov.util.makeArray(arguments);
+                        gtArgs = makeArray(arguments);
                     }
                 });
                 assert(4).isGreaterThan(2,"some message");
@@ -877,7 +905,7 @@ pavlov.specify("Pavlov", function() {
                 var gtArgs, ltArgs;
                 pavlov.extendAssertions({
                     isGreaterThan: function(actual, expected, message) {
-                        gtArgs = pavlov.util.makeArray(arguments);
+                        gtArgs = makeArray(arguments);
                     }
                 });
                 assert(4).isGreaterThan(2);
@@ -889,7 +917,7 @@ pavlov.specify("Pavlov", function() {
                     var gtArgs, ltArgs;
                     pavlov.extendAssertions({
                         hasLengthOf: function(actual, expected, message) {
-                            gtArgs = pavlov.util.makeArray(arguments);
+                            gtArgs = makeArray(arguments);
                         }
                     });
                     assert(['a','b','c']).hasLengthOf(3);
@@ -902,7 +930,7 @@ pavlov.specify("Pavlov", function() {
                     var gtArgs, ltArgs;
                     pavlov.extendAssertions({
                         isAFunction: function(actual, message) {
-                            gtArgs = pavlov.util.makeArray(arguments);
+                            gtArgs = makeArray(arguments);
                         }
                     });
                     var helloFn = function() { alert('hello'); };
@@ -916,7 +944,7 @@ pavlov.specify("Pavlov", function() {
                     var gtArgs, ltArgs;
                     pavlov.extendAssertions({
                         isAStringWithLengthOf: function(actual, expected, message) {
-                            gtArgs = pavlov.util.makeArray(arguments);
+                            gtArgs = makeArray(arguments);
                         }
                     });
                     assert("test string").isAStringWithLengthOf(11);
@@ -930,7 +958,7 @@ pavlov.specify("Pavlov", function() {
                         var gtArgs, ltArgs;
                         pavlov.extendAssertions({
                             isNotTheSameLiteralValueAs: function(actual, expected, message) {
-                                gtArgs = pavlov.util.makeArray(arguments);
+                                gtArgs = makeArray(arguments);
                             }
                         });
                         assert(a).isNotTheSameLiteralValueAs(b);
