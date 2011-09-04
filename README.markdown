@@ -145,7 +145,7 @@ Documentation:
 
 ### Usage Requirements
 
-* [QUnit][1] (testrunner.js, testsuite.css, testsuite.html)
+* [QUnit][1] (qunit.js, qunit.css)
 
 ### Downloading/Installing/Setup
 
