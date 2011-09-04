@@ -2,7 +2,7 @@
 // Tests for equality any JavaScript type and structure without unexpected results.
 // Discussions and reference: http://philrathe.com/articles/equiv
 // Test suites: http://philrathe.com/tests/equiv
-// Author: Philippe Rathé <prathe@gmail.com>
+// Author: Philippe Rath≈Ω <prathe@gmail.com>
 window.equiv = function () {
 
     var innerEquiv; // the real equiv function

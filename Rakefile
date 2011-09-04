@@ -14,6 +14,7 @@ task :default => :test
 BROWSERS = [
   '/Applications/Safari.app/Contents/MacOS/Safari',
   '/Applications/Firefox.app/Contents/MacOS/firefox',
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   '/Applications/Chromium.app/Contents/MacOS/Chromium',
   '/Applications/Opera.app/Contents/MacOS/Opera',
   'C:/Program Files/Mozilla Firefox/firefox.exe',
@@ -86,23 +87,23 @@ end
 
 desc "Run the tests against JsTestDriver"
 task :testdrive => [:build] do
-  sh("java -jar spec/lib/js-test-driver/JsTestDriver.jar --tests all --captureConsole --reset")
+  sh("java -jar spec/lib/js-test-driver/JsTestDriver.jar --tests all --captureConsole --reset  --basePath ./ --config spec/lib/js-test-driver/jsTestDriver.conf")
 end
 
 
 desc "Start the JsTestDriver server"
-task :server => [:install_server] do
+task :server => [:install_server, :build] do
   browsers = BROWSERS.find_all{|b| File.exists? b}.join(',')
-  sh("java -jar spec/lib/js-test-driver/JsTestDriver.jar --port 9876 --browser \"#{browsers}\"")
+  sh("java -jar spec/lib/js-test-driver/JsTestDriver.jar --port 9876  --basePath ./ --config spec/lib/js-test-driver/jsTestDriver.conf --browser \"#{browsers}\"")
 end
 
 
 desc "Download Google JsTestDriver"
 task :install_server do
   if !File.exist?('spec/lib/js-test-driver/JsTestDriver.jar') then
-    puts 'Downloading JsTestDriver from Google (http://js-test-driver.googlecode.com/files/JsTestDriver-1.0b.jar) ...'
+    puts 'Downloading JsTestDriver from Google (http://js-test-driver.googlecode.com/files/JsTestDriver-1.3.2.jar) ...'
     Net::HTTP.start("js-test-driver.googlecode.com") do |http|
-      resp = http.get("/files/JsTestDriver-1.0b.jar")
+      resp = http.get("/files/JsTestDriver-1.3.2.jar")
       open("spec/lib/js-test-driver/JsTestDriver.jar", "wb") do |file|
         file.write(resp.body)
       end

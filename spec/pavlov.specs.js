@@ -18,6 +18,8 @@ pavlov.util.extend(pavlov.adapter, {
     }
 });
 
+var global = this;
+
 
 (function(){
     var isArray = function(obj) {
@@ -204,8 +206,8 @@ pavlov.specify("Pavlov", function() {
         });
 
         it("should not pollute the global namespace", function() {
-            pavlov.util.each("describe,it,wait,assert,before,after,given".split(','), function() {
-                assert(window[String(this)]).isUndefined();
+            pavlov.util.each("describe,it,wait,before,after,given".split(','), function() {
+                assert(global[String(this)]).isUndefined();
             });
         });
     });
@@ -410,7 +412,7 @@ pavlov.specify("Pavlov", function() {
                 var original = {
                     pause: pavlov.adapter.pause,
                     resume: pavlov.adapter.resume,
-                    setTimeout: window.setTimeout
+                    setTimeout: global.setTimeout
                 };
                 var calls = [];
                 var setTimeoutMs = 0;
@@ -420,7 +422,7 @@ pavlov.specify("Pavlov", function() {
                     // mock timing functions to capture their calls from wait()
                     pavlov.adapter.pause = function() { calls.push('pause'); };
                     pavlov.adapter.resume = function() { calls.push('resume'); };
-                    window.setTimeout = function(fn, ms) {
+                    global.setTimeout = function(fn, ms) {
                         calls.push('settimeout');
                         setTimeoutMs = ms;
                         fn();
@@ -435,7 +437,7 @@ pavlov.specify("Pavlov", function() {
                     // undo mocking
                     pavlov.adapter.pause = original.pause;
                     pavlov.adapter.resume = original.resume;
-                    window.setTimeout = original.setTimeout;
+                    global.setTimeout = original.setTimeout;
                 }
 
                 // check if calls to mocked fn's occurred correctly
@@ -987,12 +989,14 @@ pavlov.specify("Pavlov", function() {
         describe("initiate", function(){
             it("should update heading to suite name", function(){
                 var h1s = document.getElementsByTagName('h1');
-                assert(h1s[0].innerHTML).equals('Pavlov Specifications');
+                if(h1s && h1s.length > 0) {
+                    assert(h1s[0].innerHTML).equals('Pavlov Specifications');
+                }
             });
         });
         describe("assert", function(){
             it("should proxy QUnit's ok()", function(){
-                var args = mock(window, 'ok', function(expression, message){
+                var args = mock(global, 'ok', function(expression, message){
                     pavlov.adapter.assert(true, "some message");
                 });
                 assert(args).contentsEqual([true, 'some message']);
@@ -1001,7 +1005,7 @@ pavlov.specify("Pavlov", function() {
         describe("pause", function(){
             it("should proxy QUnit's stop()", function(){
                 var stopped = false;
-                mock(window, 'stop', function(){
+                mock(global, 'stop', function(){
                     stopped = true;
                     pavlov.adapter.pause();
                 });
@@ -1011,7 +1015,7 @@ pavlov.specify("Pavlov", function() {
         describe("resume", function(){
             it("should proxy QUnit's start()", function(){
                 var started = false;
-                mock(window, 'start', function(){
+                mock(global, 'start', function(){
                     started = true;
                     pavlov.adapter.resume();
                 });
@@ -1021,7 +1025,7 @@ pavlov.specify("Pavlov", function() {
         describe("assertion extensions", function(){
             describe("isSameAs", function(){
                 it("should proxy QUnit's deepEqual()", function(){
-                    var args = mock(window, 'deepEqual', function(actual, expected, message){
+                    var args = mock(global, 'deepEqual', function(actual, expected, message){
                         assert('something').isSameAs('somethingElse', "some message");
                     });
                     assert(args).contentsEqual(['something','somethingElse','some message']);
@@ -1029,7 +1033,7 @@ pavlov.specify("Pavlov", function() {
             });
             describe("isNotSameAs", function(){
                 it("should proxy QUnit's notDeepEqual()", function(){
-                    var args = mock(window, 'notDeepEqual', function(actual, expected, message){
+                    var args = mock(global, 'notDeepEqual', function(actual, expected, message){
                         assert('something').isNotSameAs('somethingElse', "some message");
                     });
                     assert(args).contentsEqual(['something','somethingElse','some message']);
@@ -1039,7 +1043,7 @@ pavlov.specify("Pavlov", function() {
     });
 });
 
-module("Standard QUnit module");
+module("Second Standard QUnit module");
 var secondStandardQUnitTestRan = false;
 test("should be able to run after Pavlov's QUnit Adapter", function() {
     expect(1);

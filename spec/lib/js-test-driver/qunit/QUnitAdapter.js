@@ -1,6 +1,6 @@
 /*
 QUnitAdapter
-Version: 1.0.1
+Version: 1.1.0
 
 Run qunit tests using JS Test Driver
 
@@ -15,26 +15,32 @@ you need to set it up and tear it down in each test.
 
 */
 (function() {
-   
+
+	if(!(window.equiv)) {
+		throw new Error("QUnitAdapter.js - Unable to find equiv function. Ensure you have added equiv.js to the load section of your jsTestDriver.conf");
+	}
+
+	var QUnitTestCase;
+
     window.module = function(name, lifecycle) {
         QUnitTestCase = TestCase(name);
-		QUnitTestCase.tearDown = function() {};
-
-        if (lifecycle) {
-            QUnitTestCase.prototype.setUp = lifecycle.setup;
-            QUnitTestCase.tearDown = lifecycle.teardown;
-        }
+        QUnitTestCase.prototype.lifecycle = lifecycle || {};
     };
     
-    window.test = function(name, test) {
-		var tearDown = QUnitTestCase.tearDown;
-        QUnitTestCase.prototype['test ' + name] = function() {
-			try {
-				test();
-			} catch(ex) {
-				throw(ex);
-			} finally {
-				tearDown();
+    window.test = function(name, expected, test) {
+    	QUnitTestCase.prototype['test ' + name] = function() {
+        	if(this.lifecycle.setup) {
+        		this.lifecycle.setup();
+        	}
+       		if(expected.constructor === Number) {
+       			expectAsserts(expected);	
+       		} else {
+       			test = expected;
+       		}
+       		test.call(this.lifecycle);
+       		
+			if(this.lifecycle.teardown) {
+				this.lifecycle.teardown();
 			}
 		};
     };
@@ -73,5 +79,7 @@ you need to set it up and tear it down in each test.
     	equiv: window.equiv,
     	ok: window.ok
     };
+
+	module('Default Module');
 
 })();
