@@ -392,6 +392,14 @@ pavlov.specify("Pavlov", function() {
                     assert(z).equals(arrayPassedMultiArgGivenCount * 3 + 3);
                     arrayPassedMultiArgGivenCount++;
             });
+
+            given([1,1],[2,2],[3,3]).
+                it("should delegate arguments to async tests", async(function(a,b){
+                    assert(typeof a).isNotEqualTo("undefined");
+                    assert(typeof b).isNotEqualTo("undefined");
+                    assert(a).equals(b);
+                    resume();
+                }));
         });
 
         describe("with a wait()", function() {

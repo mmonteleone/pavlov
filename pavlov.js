@@ -373,7 +373,7 @@
         async: function(fn) {
             var implementation = function(){
                 adapter.pause();
-                fn();
+                fn.apply(this, arguments);
             };
             implementation.async = true;
             return implementation;
