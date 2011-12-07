@@ -8,7 +8,7 @@
  * Copyright (c) 2009-2011 Michael Monteleone
  * Licensed under terms of the MIT License (README.markdown)
  */
-(function(global){
+(function (global) {
 
     // ===========
     // = Helpers =
@@ -20,19 +20,19 @@
          * @param {Object|Array} object object or array to iterate
          * @param {Function} callback callback for each iterated item
          */
-        each: function(object, callback) {
-            if(typeof object === 'undefined' || typeof callback === 'undefined' ||
-                object === null || callback === null) {
+        each: function (object, callback) {
+            if (typeof object === 'undefined' || typeof callback === 'undefined'
+                || object === null || callback === null) {
                 throw "both 'target' and 'callback' arguments are required";
             }
-            var name;
-            var i = 0;
-            var length = object.length;
-            var value;
+            var name,
+                i = 0,
+                length = object.length,
+                value;
 
             if (length === undefined) {
                 for (name in object) {
-                    if(object.hasOwnProperty(name)) {
+                    if (object.hasOwnProperty(name)) {
                         if (callback.call( object[name], name, object[name]) === false) {
                             break;
                         }
@@ -52,7 +52,7 @@
          * @param {Object} array array-like object
          * @returns array
          */
-        makeArray: function(array) {
+        makeArray: function (array) {
             return Array.prototype.slice.call(array);
         },
         /**
@@ -60,7 +60,7 @@
          * @param {Object} obj object to test
          * @returns whether or not object is array
          */
-        isArray: function(obj) {
+        isArray: function (obj) {
             return Object.prototype.toString.call(obj) === "[object Array]";
         },
         /**
@@ -68,14 +68,14 @@
          * @param {Object} dest object to receive merged properties
          * @param {Object} src object containing properies to merge
          */
-        extend: function(dest, src) {
-            if(typeof dest === 'undefined' || typeof src === 'undefined' ||
+        extend: function (dest, src) {
+            if (typeof dest === 'undefined' || typeof src === 'undefined' ||
                 dest === null || src === null) {
                 throw "both 'source' and 'target' arguments are required";
             }
             var prop;
-            for(prop in src) {
-                if(src.hasOwnProperty(prop)) {
+            for (prop in src) {
+                if (src.hasOwnProperty(prop)) {
                     dest[prop] = src[prop];
                 }
             }
@@ -90,14 +90,14 @@
          * @param {Object} obj object to serialize
          * @returns naive display-serialized string representation of the object
          */
-        serialize: function(obj) {
-            if(typeof obj === 'undefined') {
+        serialize: function (obj) {
+            if (typeof obj === 'undefined') {
                 return "";
-            } else if(Object.prototype.toString.call(obj) === "[object Array]") {
+            } else if (Object.prototype.toString.call(obj) === "[object Array]") {
                 return '[' + obj.toString() + ']';
-            } else if(Object.prototype.toString.call(obj) === "[object Function]") {
+            } else if (Object.prototype.toString.call(obj) === "[object Function]") {
                 return "function()";
-            } else if(typeof obj == "string") {
+            } else if (typeof obj === "string") {
                 return '"' + obj + '"';
             } else {
                 return obj;
@@ -109,8 +109,8 @@
          * @param {string} value pascal or camel-cased string
          * @returns all-lower-case space-separated phrase
          */
-        phraseCase: function(value) {
-            return value.replace(/([A-Z])/g,' $1').toLowerCase();
+        phraseCase: function (value) {
+            return value.replace(/([A-Z])/g, ' $1').toLowerCase();
         }
     };
 
@@ -126,9 +126,9 @@
          * @param {String} prop Name of property to roll up
          * @returns array of values corresponding to prop name
          */
-        rollup = function(example, prop) {
+        rollup = function (example, prop) {
             var items = [];
-            while(example !== null) {
+            while (example !== null) {
                 items.push(example[prop]);
                 example = example.parent;
             }
@@ -144,7 +144,7 @@
      * @param {example} parent example to append self as child to (optional)
      */
     function Example(parent) {
-        if(parent) {
+        if (parent) {
             // if there's a parent, append self as nested example
             this.parent = parent;
             this.parent.children.push(this);
@@ -161,27 +161,27 @@
         parent: null,                       // parent example
         children: [],                       // nested examples
         specs: [],                          // array of it() tests/specs
-        before: function() {},              // called before all contained specs
-        after: function() {},               // called after all contained specs
+        before: function () {},              // called before all contained specs
+        after: function () {},               // called after all contained specs
         /**
          * rolls up this and ancestor's before functions
          * @returns array of functions
          */
-        befores: function(){
+        befores: function () {
             return rollup(this, 'before').reverse();
         },
         /**
          * Rolls up this and ancestor's after functions
          * @returns array of functions
          */
-        afters: function(){
+        afters: function () {
             return rollup(this, 'after');
         },
         /**
          * Rolls up this and ancestor's description names, joined
          * @returns string of joined description names
          */
-        names: function(){
+        names: function () {
             return rollup(this, 'name').reverse().join(', ');
         }
     });
@@ -202,7 +202,7 @@
      */
     function AssertionHandler(value) {
         this.value = value;
-    };
+    }
 
     /**
      * Appends assertion methods to the AssertionHandler prototype
@@ -210,9 +210,9 @@
      * assertion function to assertionHandler prototype which can run implementation
      * @param {Object} asserts Object containing assertion implementations
      */
-    var addAssertions = function(asserts) {
-        util.each(asserts, function(name, fn){
-            AssertionHandler.prototype[name] = function() {
+    var addAssertions = function (asserts) {
+        util.each(asserts, function (name, fn) {
+            AssertionHandler.prototype[name] = function () {
                 // implement this handler against backend
                 // by pre-pending AssertionHandler's current value to args
                 var args =  util.makeArray(arguments);
@@ -220,9 +220,9 @@
 
                 // if no explicit message was given with the assertion,
                 // then let's build our own friendly one
-                if(fn.length === 2) {
+                if (fn.length === 2) {
                     args[1] = args[1] || 'asserting ' + util.serialize(args[0]) + ' ' + util.phraseCase(name);
-                } else if(fn.length === 3) {
+                } else if (fn.length === 3) {
                     var expected = util.serialize(args[1]);
                     args[2] = args[2] || 'asserting ' + util.serialize(args[0]) + ' ' + util.phraseCase(name) + (expected ? ' ' + expected : expected);
                 }
@@ -236,51 +236,51 @@
      * Add default assertions
      */
     addAssertions({
-        equals: function(actual, expected, message) {
+        equals: function (actual, expected, message) {
             adapter.assert(actual == expected, message);
         },
-        isEqualTo: function(actual, expected, message) {
+        isEqualTo: function (actual, expected, message) {
             adapter.assert(actual == expected, message);
         },
-        isNotEqualTo: function(actual, expected, message) {
+        isNotEqualTo: function (actual, expected, message) {
             adapter.assert(actual != expected, message);
         },
-        isStrictlyEqualTo: function(actual, expected, message) {
+        isStrictlyEqualTo: function (actual, expected, message) {
             adapter.assert(actual === expected, message);
         },
-        isNotStrictlyEqualTo: function(actual, expected, message) {
+        isNotStrictlyEqualTo: function (actual, expected, message) {
             adapter.assert(actual !== expected, message);
         },
-        isTrue: function(actual, message) {
+        isTrue: function (actual, message) {
             adapter.assert(actual, message);
         },
-        isFalse: function(actual, message) {
+        isFalse: function (actual, message) {
             adapter.assert(!actual, message);
         },
-        isNull: function(actual, message) {
+        isNull: function (actual, message) {
             adapter.assert(actual === null, message);
         },
-        isNotNull: function(actual, message) {
+        isNotNull: function (actual, message) {
             adapter.assert(actual !== null, message);
         },
-        isDefined: function(actual, message) {
+        isDefined: function (actual, message) {
             adapter.assert(typeof actual !== 'undefined', message);
         },
-        isUndefined: function(actual, message) {
+        isUndefined: function (actual, message) {
             adapter.assert(typeof actual === 'undefined', message);
         },
-        pass: function(actual, message) {
+        pass: function (actual, message) {
             adapter.assert(true, message);
         },
-        fail: function(actual, message) {
+        fail: function (actual, message) {
             adapter.assert(false, message);
         },
-        throwsException: function(actual, expectedErrorDescription, message) {
+        throwsException: function (actual, expectedErrorDescription, message) {
             // can optionally accept expected error message
             try {
                 actual();
                 adapter.assert(false, message);
-            } catch(e) {
+            } catch (e) {
                 // so, this bit of weirdness is basically a way to allow for the fact
                 // that the test may have specified a particular type of error to catch, or not.
                 // and if not, e would always === e.
@@ -304,14 +304,14 @@
          * @param {String} description Name of what's being "described"
          * @param {Function} fn Function containing description (before, after, specs, nested examples)
          */
-        describe: function(description, fn) {
-            if(arguments.length < 2) {
+        describe: function (description, fn) {
+            if (arguments.length < 2) {
                 throw "both 'description' and 'fn' arguments are required";
             }
 
             // capture reference to current example before construction
             var originalExample = currentExample;
-            try{
+            try {
                 // create new current example for construction
                 currentExample = new Example(currentExample);
                 currentExample.name = description;
@@ -326,8 +326,8 @@
          * Sets a function to occur before all contained specs and nested examples' specs
          * @param {Function} fn Function to be executed
          */
-        before: function(fn) {
-            if(arguments.length === 0) {
+        before: function (fn) {
+            if (arguments.length === 0) {
                 throw "'fn' argument is required";
             }
             currentExample.before = fn;
@@ -337,8 +337,8 @@
          * Sets a function to occur after all contained tests and nested examples' tests
          * @param {Function} fn Function to be executed
          */
-        after: function(fn) {
-            if(arguments.length === 0) {
+        after: function (fn) {
+            if (arguments.length === 0) {
                 throw "'fn' argument is required";
             }
             currentExample.after = fn;
@@ -350,18 +350,18 @@
          * @param {String} specification Description of what "it" "should do"
          * @param {Function} fn Function containing a test to assert that it does indeed do it (optional)
          */
-        it: function(specification, fn) {
-            if(arguments.length === 0) {
+        it: function (specification, fn) {
+            if (arguments.length === 0) {
                 throw "'specification' argument is required";
             }
-            if(fn) {
-                if(fn.async) {
+            if (fn) {
+                if (fn.async) {
                     specification += " asynchronously";
                 }
                 currentExample.specs.push([specification, fn]);
             } else {
                 // if not passed an implementation, create an implementation that simply asserts fail
-                api.it(specification, function(){api.assert.fail('Not Implemented');});
+                api.it(specification, function () {api.assert.fail('Not Implemented');});
             }
         },
 
@@ -370,8 +370,8 @@
          * The spec must call resume() when ready
          * @param {Function} fn Function containing a test to assert that it does indeed do it (optional)
          */
-        async: function(fn) {
-            var implementation = function(){
+        async: function (fn) {
+            var implementation = function () {
                 adapter.pause();
                 fn.apply(this, arguments);
             };
@@ -386,12 +386,12 @@
          * function to be called for each of given's arguments
          * @param {Array} arguments either list of values or list of arrays of values
          */
-        given: function() {
-            if(arguments.length === 0) {
+        given: function () {
+            if (arguments.length === 0) {
                 throw "at least one argument is required";
             }
             var args = util.makeArray(arguments);
-            if(arguments.length === 1 && util.isArray(arguments[0])) {
+            if (arguments.length === 1 && util.isArray(arguments[0])) {
                 args = args[0];
             }
 
@@ -400,10 +400,10 @@
                  * Defines a row spec (test) which is applied against each
                  * of the given's arguments.
                  */
-                it: function(specification, fn) {
-                    util.each(args, function(){
+                it: function (specification, fn) {
+                    util.each(args, function () {
                         var arg = this;
-                        api.it("given " + arg + ", " + specification, function(){
+                        api.it("given " + arg + ", " + specification, function () {
                             fn.apply(this, util.isArray(arg) ? arg : [arg]);
                         });
                     });
@@ -416,7 +416,7 @@
          * @param {Object} value A value to be asserted
          * @returns an AssertionHandler instance to fluently perform an assertion with
          */
-        assert: function(value) {
+        assert: function (value) {
             return new AssertionHandler(value);
         },
 
@@ -426,12 +426,12 @@
          * @param {Function} fn Function to execute after ms has
          * passed before resuming
          */
-        wait: function(ms, fn) {
-            if(arguments.length < 2) {
+        wait: function (ms, fn) {
+            if (arguments.length < 2) {
                 throw "both 'ms' and 'fn' arguments are required";
             }
             adapter.pause();
-            global.setTimeout(function(){
+            global.setTimeout(function () {
                 fn();
                 adapter.resume();
             }, ms);
@@ -440,24 +440,24 @@
         /**
          * specifies test framework to pause test runner
          */
-        pause: function() {
+        pause: function () {
             adapter.pause();
         },
 
         /**
          * specifies test framework to resume test runner
          */
-        resume: function() {
+        resume: function () {
             adapter.resume();
         }
     };
 
     // extend api's assert function for easier access to
     // parameter-less assert.pass() and assert.fail() calls
-    util.each(['pass', 'fail'], function(i, method) {
-        api.assert[method] = function(message) {
+    util.each(['pass', 'fail'], function (i, method) {
+        api.assert[method] = function (message) {
             api.assert()[method](message);
-        }
+        };
     });
 
     /**
@@ -471,24 +471,24 @@
      * @returns Modified version of original function with extra scope.  Can still
      * accept parameters of original function
      */
-    var extendScope = function(fn, thisArg, extraScope) {
+    var extendScope = function (fn, thisArg, extraScope) {
 
         // get a string of the fn's parameters
-        var params = fn.toString().match(/\(([^\)]*)\)/)[1];
+        var params = fn.toString().match(/\(([^\)]*)\)/)[1],
         // get a string of fn's body
-        var source = fn.toString().match(/^[^\{]*\{((.*\s*)*)\}/m)[1];
+            source = fn.toString().match(/^[^\{]*\{((.*\s*)*)\}/m)[1];
 
         // create a new function with same parameters and
-        // body wrapped in a with(extraScope){ }
-        fn = new Function(
+        // body wrapped in a with(extraScope) { }
+        fn = new Function (
             "extraScope" + (params ?  ", " + params : ""),
-            "with(extraScope){" + source + "}");
+            "with(extraScope) {" + source + "}");
 
         // returns a fn wrapper which takes passed args,
         // pre-pends extraScope arg, and applies to modified fn
-        return function(){
+        return function () {
             var args = [extraScope];
-            util.each(arguments,function(){
+            util.each(arguments,function () {
                 args.push(this);
             });
             fn.apply(thisArg, args);
@@ -500,8 +500,8 @@
      * @param {String} name Name of what's being specified
      * @param {Function} fn Function containing exmaples and specs
      */
-    var specify = function(name, fn) {
-        if(arguments.length < 2) {
+    var specify = function (name, fn) {
+        if (arguments.length < 2) {
             throw "both 'name' and 'fn' arguments are required";
         }
         examples = [];
@@ -509,14 +509,14 @@
 
         // set the test suite title
         name += " Specifications";
-        if(typeof document !== 'undefined') {
+        if (typeof document !== 'undefined') {
             document.title = name + ' - Pavlov - ' + adapter.name;
         }
 
         // run the adapter initiation
         adapter.initiate(name);
 
-        if(specify.globalApi) {
+        if (specify.globalApi) {
             // if set to extend global api,
             // extend global api and run example builder
             util.extend(global, api);
@@ -542,13 +542,13 @@
          * which is called once before any tests are run
          * @param {String} suiteName name of the pavlov suite name
          */
-        initiate: function(suiteName) { },
+        initiate: function (suiteName) { },
         /**
          * adapter-specific assertion method
          * @param {bool} expr Boolean expression to assert against
          * @param {String} message message to pass along with assertion
          */
-        assert: function(expr, message) {
+        assert: function (expr, message) {
             throw "'assert' must be implemented by a test framework adapter";
         },
         /**
@@ -558,21 +558,21 @@
          * @param {String} suiteName name of overall test suite
          * @param {Array} examples Array of example object instances, possibly nesteds
          */
-        compile: function(suiteName, examples) {
+        compile: function (suiteName, examples) {
             throw "'compile' must be implemented by a test framework adapter";
         },
         /**
          * adapter-specific pause method.  When an adapter implements,
          * allows for its test runner to pause its execution
          */
-        pause: function() {
+        pause: function () {
             throw "'pause' not implemented by current test framework adapter";
         },
         /**
          * adapter-specific resume method.  When an adapter implements,
          * allows for its test runner to resume after a pause
          */
-        resume: function() {
+        resume: function () {
             throw "'resume' not implemented by current test framework adapter";
         }
     };
@@ -587,8 +587,8 @@
         version: '0.3.0pre',
         specify: specify,
         adapter: adapter,
-        adapt: function(frameworkName, testFrameworkAdapter) {
-            if( typeof frameworkName === "undefined" ||
+        adapt: function (frameworkName, testFrameworkAdapter) {
+            if ( typeof frameworkName === "undefined" ||
                 typeof testFrameworkAdapter === "undefined" ||
                 frameworkName === null ||
                 testFrameworkAdapter === null) {
@@ -611,12 +611,12 @@
 // = Default QUnit Adapter =
 // =========================
 
-(function(){
-    if(typeof QUnit === 'undefined') { return; }
+(function () {
+    if (typeof QUnit === 'undefined') { return; }
 
     pavlov.adapt("QUnit", {
-        initiate: function(name) {
-            var addEvent = function(elem, type, fn){
+        initiate: function (name) {
+            var addEvent = function (elem, type, fn) {
                 if (elem.addEventListener) {
                     elem.addEventListener(type, fn, false);
                 } else if (elem.attachEvent) {
@@ -625,10 +625,10 @@
             };
 
             // after suite loads, set the header on the report page
-            addEvent(window,'load',function(){
+            addEvent(window,'load',function () {
                 // document.getElementsByTag('h1').innerHTML = name;
                 var h1s = document.getElementsByTagName('h1');
-                if(h1s.length > 0){
+                if (h1s.length > 0) {
                     h1s[0].innerHTML = name;
                 }
             });
@@ -636,19 +636,19 @@
         /**
          * Implements assert against QUnit's `ok`
          */
-        assert: function(expr, msg) {
+        assert: function (expr, msg) {
             ok(expr, msg);
         },
         /**
          * Implements pause against QUnit's stop()
          */
-        pause: function() {
+        pause: function () {
             stop();
         },
         /**
          * Implements resume against QUnit's start()
          */
-        resume: function() {
+        resume: function () {
             start();
         },
         /**
@@ -657,7 +657,7 @@
          * @param {Array} examples Array of possibly nested Example instances
          * @returns function of which, when called, will execute all translated QUnit statements
          */
-        compile: function(name, examples) {
+        compile: function (name, examples) {
             var statements = [],
                 each = pavlov.util.each;
 
@@ -666,7 +666,7 @@
              * @param {Example} example Single example instance
              * possibly with nested instances
              */
-            var compileDescription = function(example) {
+            var compileDescription = function (example) {
 
                 // get before and after rollups
                 var befores = example.befores(),
@@ -674,40 +674,40 @@
 
                 // create a module with setup and teardown
                 // that executes all current befores/afters
-                statements.push(function(){
+                statements.push(function () {
                     module(example.names(), {
-                        setup: function(){
-                            each(befores, function(){ this(); });
+                        setup: function () {
+                            each(befores, function () { this(); });
                         },
-                        teardown: function(){
-                            each(afters, function(){ this(); });
+                        teardown: function () {
+                            each(afters, function () { this(); });
                         }
                     });
                 });
 
                 // create a test for each spec/"it" in the example
-                each(example.specs, function(){
+                each(example.specs, function () {
                     var spec = this;
-                    statements.push(function(){
+                    statements.push(function () {
                         test(spec[0],spec[1]);
                     });
                 });
 
                 // recurse through example's nested examples
-                each(example.children, function() {
+                each(example.children, function () {
                     compileDescription(this);
                 });
             };
 
             // compile all root examples
-            each(examples, function() {
+            each(examples, function () {
                 compileDescription(this, statements);
             });
 
             // return a single function which, when called,
             // executes all qunit statements
-            return function(){
-                each(statements, function(){ this(); });
+            return function () {
+                each(statements, function () { this(); });
             };
         }
     });
@@ -716,13 +716,13 @@
         /**
          * Asserts two objects are deeply equivalent, proxying QUnit's deepEqual assertion
          */
-        isSameAs: function(actual, expected, message) {
+        isSameAs: function (actual, expected, message) {
             deepEqual(actual, expected, message);
         },
         /*
          * Asserts two objects are deeply in-equivalent, proxying QUnit's notDeepEqual assertion
          */
-        isNotSameAs: function(actual, expected, message) {
+        isNotSameAs: function (actual, expected, message) {
             notDeepEqual(actual, expected, message);
         }
     });
