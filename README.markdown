@@ -121,7 +121,7 @@ No, not really.  Pavlov is just a library providing a higher-level way of intera
 
 No.  Pavlov provides a different mode of testing with higher level constructs for operating in that mode.  Just like other Behavior Driven Development (BDD) testing frameworks, this shifts the focus of unit testing from QA to Design.  Here is the point in the worn-out debate where many reasonable arguments can be made about how that's what TDD was always about in the first place.  I'd probably agree.
 
-At any rate, being able to define nested, private, example scopes with cascading befores/afters and data-generated row tests can be really useful, strict BDD or otherwise.  It's a natural, hierarchical, way of composing and testing functionality.
+At any rate, being able to define **nested, private, example scopes with cascading befores/afters and data-generated row tests** can be really useful, strict BDD or otherwise.  It's a natural, hierarchical, way of composing and testing functionality.
 
 **So why would I want this?**
 
@@ -386,10 +386,31 @@ For more readable tests, domain-specific assertions can be added.
 
 ### Extra
 
+#### async(), resume()
+
+Whenever possible, it's best to abstract out any non-deterministic/asynchronous dependencies from tests.  However, this isn't always easy or possible.  To assist with specifying features whose tests must be run asynchronously, `async()` and `resume()` allow for a fluent way of pausing/resuming the test runner.
+
+*Parameters*
+
+* fn (Function) - spec implementation expected to contain asynchronous work of arbirary/unpredictable duration.  This must also contain a call to `resume()` whenever the test runner should continue.
+
+*Example*
+
+    describe("An example", function(){
+        it("can specify asynchronous specs", async(function(){
+            // an async spec implementation will pause the test runner until 'resume()'
+            setTimeout(function(){
+                assert.pass();
+                resume();
+            }, 500);
+        }));        
+    });
+
+Note the required call to `resume()`.  When run, the test runner will pause for the 500 ms which this test takes to complete, and will append "asynchronously" to its line item: **An example can specify asynchronous specs asynchronously**
 
 #### wait()
 
-One of QUnit's strengths is its support for testing asynchronous code.  To slightly help with this, the `wait` method wraps up the pattern of pausing the test runner for a duration, running code, and then re-starting.   Not unlike a setTimeout, except it backs against QUnit's `stop` and `start`.  This is really only meant for scenarios where injecting/overriding the clock isn't practical.
+An alternative to explicitly pausing and resuming the test runner is to pause for a known duration.  The `wait` method wraps the pattern of pausing the test runner for a duration, running code, and then re-starting.   This is really only meant for scenarios where an asynchronous action has a known duration (like an animation) and injecting/overriding the clock isn't practical.
 
 *Parameters*
 
@@ -460,6 +481,10 @@ Credit of course goes to:
 Changelog
 ---------
 
+* 0.3.0
+    - added async() and resume()
+    - implemented test framework adapter pattern, abstracted QUnit usage into a default-bundled adapter
+    - readable, friendly, default assertion messages when custom message are not provided
 * 0.2.3
     - removed GPL license.  Now just MIT.  So long, jQuery dual license weirdness.
     - cleaned up and hopefully simplified project tree
@@ -476,7 +501,7 @@ Changelog
 License
 -------
 
-Copyright (c) 2009 Michael Monteleone, http://michaelmonteleone.net
+Copyright (c) 2009-2011 Michael Monteleone, http://michaelmonteleone.net
 
 The MIT License
 
