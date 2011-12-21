@@ -601,6 +601,7 @@
             each: util.each,
             extend: util.extend
         },
+        api: api,
         globalApi: false,                 // when true, adds api to global scope
         extendAssertions: addAssertions   // function for adding custom assertions
     };
