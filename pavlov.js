@@ -275,6 +275,12 @@
         fail: function (actual, message) {
             adapter.assert(false, message);
         },
+        isFunction: function(actual, message) {
+            return adapter.assert(typeof actual === "function", message);
+        },
+        isNotFunction: function (actual, message) {
+            return adapter.assert(typeof actual !== "function", message);
+        },
         throwsException: function (actual, expectedErrorDescription, message) {
             // can optionally accept expected error message
             try {

@@ -803,6 +803,58 @@ pavlov.specify("Pavlov", function() {
 
         });
 
+        describe("isFunction()", function(){
+
+            it("shold pass false to adapter's assert when not a funciton", function(){
+                var passedArgs = mock(pavlov.adapter, 'assert', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
+                    assert({}).isFunction("message");
+                });
+
+                // verify correct arguments would have been passed to qunit
+                assert(passedArgs).contentsEqual([false,"message"]);
+            });
+
+            it("should pass true to adapter's assert if a function is passed", function(){
+
+                var passedArgs = mock(pavlov.adapter, 'assert', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
+                    assert(function(){}).isFunction("message");
+                });
+
+                // verify correct arguments would have been passed to qunit
+                assert(passedArgs).contentsEqual([true,"message"]);
+
+            });
+
+        });
+
+        describe("isNotFunction()", function(){
+
+            it("shold pass true to when not a funciton", function(){
+                var passedArgs = mock(pavlov.adapter, 'assert', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
+                    assert({}).isNotFunction("message");
+                });
+
+                // verify correct arguments would have been passed to qunit
+                assert(passedArgs).contentsEqual([true,"message"]);
+            });
+
+            it("should return false if a function is passed in", function(){
+
+                var passedArgs = mock(pavlov.adapter, 'assert', function(){
+                    // run spec assertion while underlying qunit assertion is mocked
+                    assert(function(){}).isNotFunction("message");
+                });
+
+                // verify correct arguments would have been passed to qunit
+                assert(passedArgs).contentsEqual([false,"message"]);
+
+            });
+
+        });
+
         describe("throwsException()", function(){
 
             it("should pass true to adapter's assert when function throws exception", function(){
