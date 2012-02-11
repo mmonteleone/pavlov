@@ -1101,6 +1101,39 @@ pavlov.specify("Pavlov", function() {
             });
         });
     });
+
+    describe("api", function(){
+        it("should expose 'describe'", function(){
+            assert(pavlov.api.describe).isSameAs(describe);
+        });
+        it("should expose 'before'", function(){
+            assert(pavlov.api.before).isSameAs(before);
+        });
+        it("should expose 'after'", function(){
+            assert(pavlov.api.after).isSameAs(after);
+        });
+        it("should expose 'it'", function(){
+            assert(pavlov.api.it).isSameAs(it);
+        });
+        it("should expose 'async'", function(){
+            assert(pavlov.api.async).isSameAs(async);
+        });
+        it("should expose 'given'", function(){
+            assert(pavlov.api.given).isSameAs(given);
+        });
+        it("should expose 'assert'", function(){
+            assert(pavlov.api.assert).isSameAs(assert);
+        });
+        it("should expose 'wait'", function(){
+            assert(pavlov.api.wait).isSameAs(wait);
+        });
+        it("should expose 'pause'", function(){
+            assert(pavlov.api.pause).isSameAs(pause);
+        });
+        it("should expose 'resume'", function(){
+            assert(pavlov.api.resume).isSameAs(resume);
+        });
+    });
 });
 
 module("Second Standard QUnit module");
