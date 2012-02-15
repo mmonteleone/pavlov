@@ -22,79 +22,80 @@ Pavlov extends JavaScript testing framework [QUnit][1] with a rich, higher-level
 
 **Given the following (nested) specification...** (With a nod to [RSpec][9])
 
-    describe("Bowling", function(){
-        // variables scoped only to this and nested examples
-        var bowling;
+```javascript
+describe("Bowling", function(){
+    // variables scoped only to this and nested examples
+    var bowling;
 
-        // befores and afters:
+    // befores and afters:
+
+    before(function(){
+        // this setup occurs before all specs both
+        // in this example, and any nested examples
+        bowling = new Bowling();
+    });
+
+    // specs:
+
+    it("should score 0 for gutter game", function(){
+        for(var i=0;i<20;i++) {
+            bowling.hit(0);
+        }
+
+        assert(bowling.score).equals(0);
+    });
+
+    // stubs specs which yield "Not Implemented" failures:
+
+    it("should allow 2 rolls on frame 1-9");
+    it("should allow 3 rolls on the last frame");
+
+    // generative row tests:
+
+    given([5, 4], [8, 2], [9, 1]).
+        it("should award a spare if all knocked down on 2nd roll", function(roll1, roll2) {
+            // this spec is called 3 times, with each of the 3 sets of given()'s
+            // parameters applied to it as arguments
+
+            if(roll1 + roll2 == 10) {
+                bowling.display('Spare!');
+            }
+
+            assert(bowling.displayMessage).equals('Spare!');
+        });
+
+    // nested examples (n-level depth):
+
+    describe("Duck Pin Variation", function(){
 
         before(function(){
-            // this setup occurs before all specs both
-            // in this example, and any nested examples
-            bowling = new Bowling();
-        });
+            // setup method which occurs before all of this example's
+            // specs, but after the parent example's before()
+            bowling.mode = BowlingMode.DuckPin;
+        })
 
-        // specs:
-
-        it("should score 0 for gutter game", function(){
-            for(var i=0;i<20;i++) {
-                bowling.hit(0);
-            }
-
-            assert(bowling.score).equals(0);
-        });
-
-        // stubs specs which yield "Not Implemented" failures:
-
-        it("should allow 2 rolls on frame 1-9");
-        it("should allow 3 rolls on the last frame");
-
-        // generative row tests:
-
-        given([5, 4], [8, 2], [9, 1]).
-            it("should award a spare if all knocked down on 2nd roll", function(roll1, roll2) {
-                // this spec is called 3 times, with each of the 3 sets of given()'s
-                // parameters applied to it as arguments
-
-                if(roll1 + roll2 == 10) {
-                    bowling.display('Spare!');
-                }
-
-                assert(bowling.displayMessage).equals('Spare!');
-            });
-
-        // nested examples (n-level depth):
-
-        describe("Duck Pin Variation", function(){
-
-            before(function(){
-                // setup method which occurs before all of this example's
-                // specs, but after the parent example's before()
-                bowling.mode = BowlingMode.DuckPin;
-            })
-
-            it("should allow 3 balls per frame");
-            it("should award no bonus if knocked down in 3rd frame");
-
-        });
-
-        // fluent assertions
-
-        it("should only allow 10 frames", function(){
-            // add 10 frames
-            for(var i=0;i<10;i++) {
-                bowling.moveNextFrame();
-            }
-
-            // try to add an 11th
-            // expect an exception
-            assert(function(){
-                bowling.moveNextFrame();
-            }).throwsException();
-        });
+        it("should allow 3 balls per frame");
+        it("should award no bonus if knocked down in 3rd frame");
 
     });
 
+    // fluent assertions
+
+    it("should only allow 10 frames", function(){
+        // add 10 frames
+        for(var i=0;i<10;i++) {
+            bowling.moveNextFrame();
+        }
+
+        // try to add an 11th
+        // expect an exception
+        assert(function(){
+            bowling.moveNextFrame();
+        }).throwsException();
+    });
+
+});
+```
 **...Pavlov compiles the examples down into flattened vanilla QUnit `module` and `test` statements which are then executed**
 
     Bowling: should score 0 for gutter game
