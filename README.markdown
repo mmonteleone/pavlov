@@ -161,9 +161,9 @@ Tests can be run by simply opening the test host document in a browser or by tak
 ### Creating Examples
 
 
-#### QUnit.specify()
+#### pavlov.specify()
 
-Function which declares a new QUnit.specify context.  It's the required top-level method which provides an overall scope for creation, compilation, and running of Pavlov specs.
+Function which declares a new pavlov.specify context.  It's the required top-level method which provides an overall scope for creation, compilation, and running of Pavlov specs.
 
 *Parameters*
 
@@ -172,7 +172,7 @@ Function which declares a new QUnit.specify context.  It's the required top-leve
 
 *Example*
 
-    QUnit.specify("The Rules of Bowling", function(){
+    pavlov.specify("The Rules of Bowling", function(){
         // descriptions contained within specification context
         describe(....
         describe(....
@@ -189,7 +189,7 @@ Initiates a new Example.  A description translates to a QUnit module.
 
 *Example*
 
-    //... within a QUnit.specify scope
+    //... within a pavlov.specify scope
     describe("Bowling", function(){
         // specs contained within this description
         it(...
@@ -243,7 +243,7 @@ Examples can be nested as deep as necessary.
 
 *Example*
 
-    //... within a QUnit.specify scope
+    //... within a pavlov.specify scope
     describe("Bowling", function(){
         // specs contained within this description
         before(...
@@ -351,7 +351,7 @@ Most are self-explanatory.  Message parameter is always optional.  When a messag
 
 #### Adding custom Assertions
 
-`QUnit.specify.extendAssertions()`
+`pavlov.specify.extendAssertions()`
 
 For more readable tests, domain-specific assertions can be added.
 
@@ -365,7 +365,7 @@ For more readable tests, domain-specific assertions can be added.
     // each accepts an actual, optional expected, and message
     // the implementation names become the names of the assertions
 
-    QUnit.specify.extendAssertions({
+    pavlov.specify.extendAssertions({
         isGreaterThan: function(actual, expected, message) {
             ok(actual > expected, message);
         },
@@ -439,19 +439,19 @@ An alternative to explicitly pausing and resuming the test runner is to pause fo
 
 Pavlov shamelessly borrows Screw.Unit's clever metaprogramming technique to keep from having to inject its API into the global scope.  But if you're debugging, the fun can quickly come to an end as your tests' source have been modified and re-evaled.  Thankfully, Pavlov allows the API to be injected globally as well.
 
-Just set `QUnit.specify.globalApi = true;` before a `QUnit.specify()` block.  It defaults to `false`.
+Just set `pavlov.specify.globalApi = true;` before a `pavlov.specify()` block.  It defaults to `false`.
 
 *Property*
 
-* QUnit.specify.globalApi
+* pavlov.specify.globalApi
   * false (default): does not globally inject API, uses metaprogramming
   * true: globally injects API, no metaprogramming
 
 *Example*
 
-    QUnit.specify.globalApi = true;  // injects API into global scope
+    pavlov.specify.globalApi = true;  // injects API into global scope
     // before a standard specify
-    QUnit.specify(...
+    pavlov.specify(...
 
 Contributing
 ------------
@@ -497,7 +497,7 @@ Changelog
     - now supports `expectedErrorDescription` argument on `assert.throwsException`
     - supports `rake release`
     - updated to latest release of qunit
-    - reports own version at QUnit.specify.version
+    - reports own version at pavlov.specify.version
     - throws proper exceptions when methods not passed expected arguments
 * 0.2.1 - Updated to latest version of qunit.js/css, Fixed an IE regression in 0.2
 * 0.2 - Removed Pavlov's jQuery dependence along with QUnit's independence from jQuery
