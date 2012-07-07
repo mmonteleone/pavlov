@@ -1,0 +1,16 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    oyster (0.9.5)
+    packr (3.2.0)
+      oyster (>= 0.9.5)
+    rake (0.9.2.2)
+    zip (2.0.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  packr
+  rake
+  zip

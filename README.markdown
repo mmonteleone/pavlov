@@ -463,6 +463,8 @@ Development Requirements (for building and test running):
 
 Clone the source at `http://github.com/mmonteleone/pavlov.git` and have at it.
 
+Run `bundle install`
+
 The following build tasks are available:
 
     rake build     # builds package and minifies
@@ -483,6 +485,7 @@ Changelog
 ---------
 
 * 0.4.0
+    - Gemfile for bundler support
 * 0.3.0
     - added async() and resume()
     - implemented test framework adapter pattern, abstracted QUnit usage into a default-bundled adapter
