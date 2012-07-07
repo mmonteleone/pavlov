@@ -482,6 +482,7 @@ Credit of course goes to:
 Changelog
 ---------
 
+* 0.4.0
 * 0.3.0
     - added async() and resume()
     - implemented test framework adapter pattern, abstracted QUnit usage into a default-bundled adapter
