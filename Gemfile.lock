@@ -2,9 +2,9 @@ GEM
   remote: http://rubygems.org/
   specs:
     oyster (0.9.5)
-    packr (3.2.0)
+    packr (3.2.1)
       oyster (>= 0.9.5)
-    rake (0.9.2.2)
+    rake (13.0.1)
     zip (2.0.2)
 
 PLATFORMS
